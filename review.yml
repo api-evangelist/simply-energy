@@ -1,0 +1,350 @@
+aid: simply-energy
+name: Simply Energy
+review:
+  question: Is Simply Energy's Consumer Data Right energy obligation actually implemented
+    as a live, standards-conformant API surface, or only claimed - and does the company
+    run any developer portal beyond the mandate?
+  answer: true
+  date: '2026-07-27'
+  reviewer: API Evangelist
+  mandateImplementationConfirmed: true
+  developerPortal: false
+  brandStatus: Simply Energy rebranded to ENGIE in April 2024; the CDR obligation and
+    the live endpoints now carry the ENGIE brand name.
+  specProvenance: DSB Consumer Data Standards (shared standard) - not a retailer-proprietary
+    contract
+
+mandate:
+  regime: cdr-energy
+  regimeDetail: |
+    Australia's Consumer Data Right, established under Part IVD of the Competition and
+    Consumer Act 2010, designated by the Treasurer and administered by the ACCC with
+    technical standards set by the Data Standards Body. This is the SAME statutory
+    machinery that produced Australia's byte-for-byte identical banking APIs, extended
+    to the energy sector. Energy is therefore the control case for whether a data
+    mandate is replicable across sectors.
+  status: live-implemented
+  statusJustification: |
+    NOT a press release, NOT a compliance page, NOT merely a regulator listing an
+    obligation. Three independent pieces of evidence were fetched anonymously on
+    2026-07-27:
+
+    (1) CDR REGISTER ENTRY. The public CDR Register endpoint
+        GET https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
+        (x-v 1) returned HTTP 200 with 84 energy data holder brands. There is NO brand
+        named "Simply Energy" in the register. There IS a brand "ENGIE" with
+        dataHolderBrandId 40128cc1-56f8-ed11-a83b-000d3a8830d6, abn 67269241237,
+        publicBaseUri https://public.cdr.engie.com.au, lastUpdated 2026-07-01. That ABN
+        matches the ENGIE trading entity named in the Simply Energy / ENGIE CDR Policy.
+        A second brand "ENGIE large business" is registered under the same ABN with
+        publicBaseUri https://public-cdr-engie.bravecloud.com/b1swktl2zamng9xf/public.
+
+    (2) LIVE PUBLIC BASE URI. The registered publicBaseUri is real and CDS-conformant.
+        GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status (x-v 1) -> HTTP 200,
+        body {"data":{"status":"OK","updateTime":"2026-07-27T12:07:09.35Z",
+        "explanation":"All services operational"}}.
+        GET https://public.cdr.engie.com.au/cds-au/v1/discovery/outages (x-v 1) -> HTTP 200,
+        body {"data":{"outages":[]},"links":{"self":"https://public.cdr.engie.com.au/cds-au/v1/discovery/outages"}}.
+        Both return HTTP 406 with code urn:au-cds:error:cds-all:Header/UnsupportedVersion
+        at x-v 2 and x-v 3, i.e. correct Consumer Data Standards version negotiation.
+
+    (3) LIVE STANDARDS-CONFORMANT TARIFF DATA WITH REAL PAYLOAD.
+        GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans (x-v 1)
+        -> HTTP 200, meta.totalRecords 2452, meta.totalPages 3 at page-size 1000.
+        Sampled plans carry brand "engie", brandName "ENGIE", planIds of the form
+        ENG1145433MRE1@EME, fuelType ELECTRICITY and GAS, type MARKET and STANDING, and
+        geography.distributors covering Ausgrid, Endeavour, Essential Energy, Energex,
+        SA Power Networks, Jemena and AGN.
+        GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans/ENG1145433MRE1@EME
+        -> HTTP 406 at x-v 1 and x-v 2, HTTP 200 at x-v 3, HTTP 406 at x-v 4 and x-v 5.
+        This is a real, versioned, schema-conformant implementation, not a stub.
+
+    Conclusion: the mandate is live-implemented. The Consumer Data Right was
+    transplanted from banking into energy and it actually shipped.
+  designationDetail: |
+    Data holder provider number DH002028. The CDR Policy applies to IPower Pty Ltd
+    (ACN 111 267 228) and IPower 2 Pty Ltd (ABN 24 070 374 293) trading as ENGIE
+    (ABN 67 269 241 237), Simply Energy Solutions Pty Ltd (ABN 86 165 627 396) and
+    their related bodies corporate. Energy CDR obligations commenced for the initial
+    tranche of retailers in November 2022 and for the remaining retailers in
+    November 2023; this retailer is live.
+  caveatsAndNegativeFindings: |
+    Three things the evidence does NOT support, recorded so they are never overstated:
+
+    (a) The retailer does not self-host the mandated generic tariff data. Its own
+        registered publicBaseUri returns an nginx HTTP 404 for
+        /cds-au/v1/energy/plans at x-v 1 through 4. The identical 404 was observed at
+        https://public.cdr.agl.com.au, https://public.cdr.alintaenergy.com.au and
+        https://public.mydata.cdr.originenergy.com.au, so this is the CDR energy
+        design - generic tariff data is centralised at the Australian Energy
+        Regulator's Energy Made Easy service - and not a defect unique to this brand.
+        This is the structural difference from CDR banking, where every bank serves
+        its own Product Reference Data from its own host.
+
+    (b) CONTROL TEST - the Energy Made Easy path is NOT proof of registration on its
+        own. GET https://cdr.energymadeeasy.gov.au/zzz-not-a-real-retailer/cds-au/v1/energy/plans
+        returns HTTP 200 with {"data":{"plans":[]},"meta":{"totalRecords":0}}. An
+        arbitrary slug yields a well-formed empty 200. The proof of implementation is
+        therefore the 2,452-record NON-EMPTY payload under the /engie slug, not the
+        200 status code. For completeness, the legacy slug
+        https://cdr.energymadeeasy.gov.au/simply-energy/cds-au/v1/energy/plans also
+        returns HTTP 200 with zero plans - which, given the control result, is NOT
+        evidence of a retired registered slug and must not be reported as such.
+
+    (c) No authenticated CDR endpoint was verified. The InfoSec and resource base URIs
+        of an energy data holder are published only through the authenticated portion
+        of the CDR Register, reachable only by an accredited data recipient presenting
+        a client certificate. Anonymous probes for
+        /.well-known/openid-configuration on public.cdr.engie.com.au and
+        cdr.energymadeeasy.gov.au/engie both returned HTTP 404; cdr.engie.com.au,
+        idp.cdr.engie.com.au and api.engie.com.au do not resolve (curl exit 6).
+
+dataStandard:
+  name: CDR Consumer Data Standards (Energy)
+  version: 1.36.0
+  detail: |
+    Data Standards Body Consumer Data Standards - "CDR Energy API" v1.36.0 (OpenAPI
+    3.0.3, 18 paths) and "CDR Common API" v1.36.0 (OpenAPI 3.0.3, 4 paths). Both were
+    harvested verbatim on 2026-07-27 and converted from JSON to YAML with no content
+    change. Green Button / ESPI is NOT used. IEEE 2030.5, OpenADR, OCPP, OCPI and
+    IEC CIM 61968/61970 references were not found anywhere in this retailer's public
+    surface.
+  greenButton: not applicable - Green Button / ESPI has no role in the Australian
+    Consumer Data Right energy regime.
+
+consumerVsMarketSplit:
+  consumerDataApi: true
+  consumerDataDetail: |
+    YES. A third party can obtain an individual customer's energy usage, billing,
+    invoices, balances, concessions, payment schedule, service point and distributed
+    energy resource data through a documented, standardised API - but only as an
+    ACCC-accredited data recipient acting on an explicit consumer consent. Per the CDR
+    Policy the retailer makes available customer data (name, address, contact
+    information) and account data (account number, account creation date, connection
+    point identifiers, payment schedule and concession) for eligible consumers who are
+    at least 18, are the primary account holder or an authorised representative, have a
+    mobile number or email on file, and hold an active electricity account.
+  marketDataOpen: false
+  marketDataDetail: |
+    NO. This is a retailer, not a market or network operator. It publishes no grid,
+    system or wholesale market feed of its own - no NEM dispatch data, no carbon
+    intensity feed, no network open-data portal. Those sit with AEMO and the
+    distribution businesses, not here.
+
+    IMPORTANT - do not conflate this with the open tariff endpoint. There IS a
+    genuinely open, anonymous, unauthenticated API carrying this brand's data:
+    the CDR Generic Plans endpoint with 2,452 plans. But that is retail PRODUCT
+    REFERENCE DATA, it is mandated rather than volunteered, and it is published by the
+    Australian Energy Regulator on the retailer's behalf rather than by the retailer.
+    Counting it as "open market data" would credit the regulator's infrastructure to
+    the company.
+  theFinding: |
+    The split here is not open-versus-closed by data domain, it is
+    mandated-versus-nothing. Every byte of API surface this company has exists because
+    a statute required it. Product tariff data is wide open because the mandate made it
+    public and the regulator hosts it. Consumer data is reachable but only through
+    accreditation and consent. And outside the mandate there is precisely nothing - no
+    developer portal, no partner API, no voluntary open data.
+
+accessGate:
+  gate: accredited-only
+  whatADeveloperMustDo: |
+    For the PUBLIC generic tariff data: nothing at all. Send an anonymous HTTPS GET to
+    https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans with an x-v: 1
+    header. No key, no registration, no agreement. Use x-v: 3 for plan detail.
+
+    For the DISCOVERY endpoints: nothing. Anonymous GET to
+    https://public.cdr.engie.com.au/cds-au/v1/discovery/status with x-v: 1.
+
+    For ANY consumer data: become an accredited data recipient. Apply to the ACCC and
+    meet the CDR accreditation criteria including the information security controls in
+    Schedule 2 of the CDR Rules, obtain a CDR client certificate, register a software
+    product on the CDR Register, then implement the CDR FAPI security profile - OAuth2
+    / OpenID Connect with mutual TLS and PAR - and collect an explicit, scoped,
+    time-limited consumer consent. There is no shortcut, no sandbox key and no
+    self-serve tier. Consumers themselves can only see their own data through the
+    ENGIE customer login and the ENGIE Tracker smart-meter feature, which are
+    account-bound consumer features and not an API.
+
+authModel:
+  genericTariffData: none - public, unauthenticated; x-v header version negotiation only
+    (plans list x-v 1, plan detail x-v 3)
+  discovery: none - public, unauthenticated; x-v 1
+  consumerData: OAuth2 / OpenID Connect under the CDR FAPI profile, mutual TLS, ACCC
+    accreditation plus explicit consumer consent
+  openIdConfiguration: not published anonymously - HTTP 404 on
+    https://public.cdr.engie.com.au/.well-known/openid-configuration and on
+    https://cdr.energymadeeasy.gov.au/engie/.well-known/openid-configuration
+
+homeMarket:
+  country: Australia
+  detail: |
+    Retail supply to more than 700,000 residential and business accounts across
+    Victoria, South Australia, New South Wales, Queensland and Western Australia.
+    Tariff plans observed in the CDR data cover the Ausgrid, Endeavour, Essential
+    Energy, Energex, SA Power Networks, Jemena and Australian Gas Networks
+    distribution zones. Ultimate parent is ENGIE SA (France).
+  tier: utility-retailer
+
+findings:
+  summary: |
+    Simply Energy no longer exists as a trading brand. After seventeen years it was
+    rebranded to ENGIE in April 2024, and the CDR obligation, the register entry and
+    every live endpoint now carry the ENGIE name. The legal entities behind both names
+    are unchanged: IPower Pty Ltd and IPower 2 Pty Ltd, with data holder provider
+    number DH002028.
+
+    On the central question of this study - is a data mandate replicable across sectors
+    - this organisation is a clean YES. Australia took the statutory machinery that
+    produced its identical banking APIs and applied it to energy, and the result on the
+    wire is a real, versioned, schema-conformant, anonymously reachable API returning
+    2,452 live tariff plans, backed by a live registry entry and a live public base URI
+    with correct CDS error semantics. Nothing about this rests on a claim.
+
+    The interesting variation from banking is architectural rather than legal. In CDR
+    banking every bank serves its own Product Reference Data from its own host. In CDR
+    energy the equivalent generic tariff data is centralised at the Australian Energy
+    Regulator's Energy Made Easy service, and the retailer's own registered public base
+    URI carries only the discovery endpoints. Fifty-one of the 84 registered energy
+    brands do not even have their own hostname - they point directly at a
+    cdr.energymadeeasy.gov.au path. The mandate replicated; the topology did not.
+
+    Beyond the mandate there is nothing. developer.simplyenergy.com.au,
+    api.simplyenergy.com.au, developers.simplyenergy.com.au, docs.simplyenergy.com.au,
+    data.simplyenergy.com.au, developer.engie.com.au, api.engie.com.au,
+    docs.engie.com.au, data.engie.com.au and developers.engie.com.au all fail to
+    resolve. There is no developer portal, no self-serve signup, no partner API and no
+    open data programme. The consumer-facing "Tracker" smart-meter feature and the
+    solar and EV products are account-bound features, not APIs.
+  probeNotes: |
+    Both www.simplyenergy.com.au and engie.com.au sit behind Cloudflare and return
+    HTTP 403 to every automated fetcher tried, including browser user agents. The
+    sites are live for humans and indexed by search engines; the CDR Policy content
+    was read through search-engine indexing rather than direct fetch, and that
+    provenance is disclosed here rather than presented as a direct 200.
+    https://www.linkedin.com/company/simply-energy/ returns HTTP 404 - another
+    artefact of the rebrand - while
+    https://www.linkedin.com/company/engie-australia-new-zealand/ returns HTTP 200.
+  githubNote: |
+    The GitHub organisations github.com/SimplyEnergy (created 2017, 6 public repos,
+    no name/blog/description set) and github.com/Simply-Energy (created 2019, 0 public
+    repos) both exist but could NOT be attributed to the Australian retailer. The
+    SimplyEnergy repos are forks of cloud-builders, ksvg, wits-api-client,
+    liquibase-bigquery, turbo and stimulus, with no Australian energy signal. Neither
+    is recorded in apis.yml. github.com/engie-group is ENGIE SA's global organisation
+    (4 public repos) and is not an Australian retail API surface.
+  specProvenanceNote: |
+    The two harvested specs at openapi/simply-energy-cds-energy-openapi.yml and
+    openapi/simply-energy-cds-common-openapi.yml are the Data Standards Body Consumer
+    Data Standards contracts - "CDR Energy API" v1.36.0 and "CDR Common API" v1.36.0 -
+    retrieved verbatim from
+    https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_energy.json
+    (HTTP 200, 403,771 bytes) and
+    https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_common.json
+    (HTTP 200, 58,667 bytes) on 2026-07-27, converted from JSON to YAML without content
+    change. These are the SHARED standards every Australian energy data holder conforms
+    to; they are NOT retailer-proprietary specifications, and this retailer publishes no
+    specification of its own. The declared server in both documents,
+    https://mtls.dh.example.com/cds-au/v1, is the standard's placeholder and not a real
+    host. The real confirmed public bases are
+    https://cdr.energymadeeasy.gov.au/engie/cds-au/v1 and
+    https://public.cdr.engie.com.au/cds-au/v1.
+  transports:
+  - protocol: REST
+    scheme: https
+    baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+    documented: true
+    note: Public CDR generic tariff data. Confirmed HTTP 200, 2452 plans.
+  - protocol: REST
+    scheme: https
+    baseURL: https://public.cdr.engie.com.au/cds-au/v1
+    documented: true
+    note: Registered CDR Public Base URI. Discovery endpoints confirmed HTTP 200.
+  endpointsConfirmed:
+  - GET https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary -> 200
+    (x-v 1, 84 energy brands, ENGIE present, Simply Energy absent)
+  - GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans -> 200 (x-v 1,
+    totalRecords 2452)
+  - GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans/ENG1145433MRE1@EME
+    -> 200 (x-v 3)
+  - GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/discovery/status -> 200 (x-v 1)
+  - GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status -> 200 (x-v 1)
+  - GET https://public.cdr.engie.com.au/cds-au/v1/discovery/outages -> 200 (x-v 1)
+  endpointsProbedNegative:
+  - GET https://public.cdr.engie.com.au/cds-au/v1/energy/plans -> 404 nginx (x-v 1,2,3,4)
+  - GET https://public.cdr.engie.com.au/ -> 404 nginx
+  - GET https://public.cdr.engie.com.au/cds-au/v1/common/discovery/status -> 404 nginx
+  - GET https://public.cdr.engie.com.au/.well-known/openid-configuration -> 404
+  - GET https://cdr.energymadeeasy.gov.au/engie/.well-known/openid-configuration -> 404
+  - GET https://public.cdr.agl.com.au/cds-au/v1/energy/plans -> 404 (comparator)
+  - GET https://public.cdr.alintaenergy.com.au/cds-au/v1/energy/plans -> 404 (comparator)
+  - GET https://public.mydata.cdr.originenergy.com.au/cds-au/v1/energy/plans -> 404
+    (comparator)
+  - GET https://www.simplyenergy.com.au/ -> 403 Cloudflare
+  - GET https://engie.com.au/help-centre/cdr-policy -> 403 Cloudflare
+  - GET https://www.linkedin.com/company/simply-energy/ -> 404
+  - https://developer.simplyenergy.com.au, https://api.simplyenergy.com.au,
+    https://developers.simplyenergy.com.au, https://docs.simplyenergy.com.au,
+    https://data.simplyenergy.com.au -> DNS does not resolve (curl exit 6)
+  - https://developer.engie.com.au, https://api.engie.com.au, https://docs.engie.com.au,
+    https://data.engie.com.au, https://developers.engie.com.au -> DNS does not resolve
+    (curl exit 6)
+
+sources:
+- url: https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
+  type: Registry
+  note: Public CDR Register energy data holder brands summary. HTTP 200 (x-v 1), 84
+    brands. ENGIE listed with abn 67269241237 and publicBaseUri
+    https://public.cdr.engie.com.au; no brand named "Simply Energy".
+- url: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans
+  type: APIReference
+  note: Live public CDR generic tariff endpoint. HTTP 200 at x-v 1, 2452 ENGIE plans.
+- url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  type: APIReference
+  note: Live registered CDR Public Base URI. HTTP 200 at x-v 1, status OK; 406
+    UnsupportedVersion at x-v 2 and above.
+- url: https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_energy.json
+  type: OpenAPI
+  note: DSB Consumer Data Standards energy OpenAPI, "CDR Energy API" v1.36.0. HTTP 200,
+    403771 bytes. Shared standard harvested verbatim.
+- url: https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_common.json
+  type: OpenAPI
+  note: DSB Consumer Data Standards common OpenAPI, "CDR Common API" v1.36.0. HTTP 200,
+    58667 bytes. Shared standard harvested verbatim.
+- url: https://consumerdatastandardsaustralia.github.io/standards/
+  type: Documentation
+  note: Consumer Data Standards published documentation. HTTP 200.
+- url: https://engie.com.au/help-centre/cdr-policy
+  type: Documentation
+  note: The company's CDR Policy. HTTP 403 to automated fetchers (Cloudflare); content
+    read via search-engine indexing. Names IPower Pty Ltd ACN 111 267 228, IPower 2 Pty
+    Ltd ABN 24 070 374 293 trading as ENGIE ABN 67 269 241 237, Simply Energy Solutions
+    Pty Ltd ABN 86 165 627 396, data holder provider number DH002028.
+- url: https://www.simplyenergy.com.au/help-centre/policies-and-commitments/customer-data-right
+  type: Documentation
+  note: Legacy Simply Energy CDR policy path. HTTP 403 to automated fetchers
+    (Cloudflare).
+- url: https://engie.com.au/becoming-engie
+  type: Reference
+  note: "\"Simply Energy is now ENGIE\" rebrand page. HTTP 403 to automated fetchers."
+- url: https://en.wikipedia.org/wiki/Engie_Australia
+  type: Reference
+  note: HTTP 200. Corroborates the April 2024 Simply Energy to ENGIE rebrand and the
+    700,000+ account base across VIC, SA, NSW, QLD and WA.
+- url: https://www.energymadeeasy.gov.au/
+  type: Reference
+  note: Australian Energy Regulator price comparison service, HTTP 200. The host that
+    serves generic tariff data for CDR energy data holders.
+
+actions:
+  openapiPaths:
+  - openapi/simply-energy-cds-energy-openapi.yml
+  - openapi/simply-energy-cds-common-openapi.yml
+  apisYmlUpdated: true
+  reason: |
+    Bootstrapped the Simply Energy provider profile around a CDR energy mandate that
+    was verified as implemented rather than merely claimed, recorded the April 2024
+    rebrand to ENGIE that moved the obligation to a different brand name, listed the
+    two confirmed-live public surfaces plus the accredited-only consumer data surface,
+    and harvested the shared Consumer Data Standards energy and common contracts. No
+    proprietary specification and no developer portal exist to harvest.
