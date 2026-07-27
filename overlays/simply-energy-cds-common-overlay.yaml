@@ -1,0 +1,71 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Simply Energy (ENGIE) CDR Common API
+  version: 1.0.0
+extends: openapi/simply-energy-cds-common-openapi.yml
+x-generated: '2026-07-27'
+x-method: generated
+x-source: API Evangelist enrichment pipeline; live anonymous probes 2026-07-27
+x-note: >-
+  Binds the shared Data Standards Body CDR Common contract to this provider's real registered
+  CDR Public Base URI, and records which of the four operations are anonymously reachable.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: simply-energy
+    x-apievangelist-provider-name: Simply Energy (ENGIE)
+    x-cdr-data-holder-provider-number: DH002028
+    x-cdr-public-base-uri: https://public.cdr.engie.com.au
+    x-spec-provenance: >-
+      Harvested verbatim from
+      https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_common.json
+      on 2026-07-27 and converted from JSON to YAML with no content change.
+- target: $.servers
+  update:
+  - url: https://public.cdr.engie.com.au/cds-au/v1
+    description: >-
+      CONFIRMED LIVE 2026-07-27. The brand's own registered CDR Public Base URI. Serves
+      /discovery/status and /discovery/outages anonymously at x-v 1.
+    x-gate: public
+    x-verified: '2026-07-27'
+  - url: https://mtls.dh.example.com/cds-au/v1
+    description: >-
+      Data Standards Body PLACEHOLDER host from the shared specification. Not a real endpoint.
+    x-gate: accredited-only
+    x-placeholder: true
+- target: $.paths['/discovery/status'].get
+  update:
+    x-apievangelist-verified: '2026-07-27'
+    x-apievangelist-verified-host: https://public.cdr.engie.com.au/cds-au/v1
+    x-apievangelist-observed:
+      status: 200
+      x-v: '1'
+      body: '{"data":{"status":"OK","explanation":"All services operational"},"links":{...},"meta":{}}'
+      response-headers: 'strict-transport-security: max-age=63072000; includeSubDomains'
+      rejects: HTTP 406 urn:au-cds:error:cds-all:Header/UnsupportedVersion at x-v 2 and above
+    x-apievangelist-role: >-
+      This is the provider's status surface. It is the machine-readable equivalent of a status
+      page and is what an integrator polls; there is no HTML status dashboard.
+- target: $.paths['/discovery/outages'].get
+  update:
+    x-apievangelist-verified: '2026-07-27'
+    x-apievangelist-verified-host: https://public.cdr.engie.com.au/cds-au/v1
+    x-apievangelist-observed:
+      status: 200
+      x-v: '1'
+      body: '{"data":{"outages":[]},"links":{"self":"https://public.cdr.engie.com.au/cds-au/v1/discovery/outages"}}'
+- target: $.paths['/common/customer'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-note: Requires an authenticated CDR session with common:customer.basic:read.
+- target: $.paths['/common/customer/detail'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-note: Requires an authenticated CDR session with common:customer.detail:read.
+- target: $.components
+  update:
+    x-apievangelist-artifacts:
+      authentication: authentication/simply-energy-authentication.yml
+      conventions: conventions/simply-energy-conventions.yml
+      errors: errors/simply-energy-problem-types.yml
+      lifecycle: lifecycle/simply-energy-lifecycle.yml

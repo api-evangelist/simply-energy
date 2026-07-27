@@ -1,0 +1,157 @@
+generated: '2026-07-27'
+method: searched
+source: openapi/simply-energy-cds-common-openapi.yml, openapi/simply-energy-cds-energy-openapi.yml,
+  https://consumerdatastandardsaustralia.github.io/standards/
+provider_published: false
+provenance_note: |
+  Conformance here is a statutory obligation rather than a voluntary claim. This entity is a
+  designated Consumer Data Right energy data holder (provider number DH002028) listed on the
+  live CDR Register under the ENGIE brand, and the standards below bind it by law. Where a
+  standard could be verified anonymously on the wire, the evidence is a live probe dated
+  2026-07-27; where it could not (everything behind CDR accreditation), the entry is marked
+  as designated-but-not-anonymously-verified rather than asserted as observed.
+standards:
+- id: cdr-consumer-data-standards-energy
+  name: CDR Consumer Data Standards - Energy
+  version: 1.36.0
+  conforms: true
+  verified: live
+  evidence: |
+    GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans (x-v 1) returned HTTP
+    200 with meta.totalRecords 2452 ENGIE plans in the CDS EnergyPlan schema shape
+    (planId, brand, brandName, fuelType, type, customerType, geography, effectiveFrom,
+    lastUpdated). GET /energy/plans/{planId} returned HTTP 200 at x-v 3.
+- id: cdr-consumer-data-standards-common
+  name: CDR Consumer Data Standards - Common
+  version: 1.36.0
+  conforms: true
+  verified: live
+  evidence: |
+    GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status and /discovery/outages both
+    returned HTTP 200 at x-v 1 in the CDS ResponseCommonDiscoveryStatus and
+    ResponseDiscoveryOutagesList shapes, from the brand's own registered CDR Public Base URI.
+- id: cdr-header-version-negotiation
+  name: CDS endpoint version negotiation (x-v / x-min-v)
+  conforms: true
+  verified: live
+  evidence: 'GET /discovery/status with x-v: 9 returned HTTP 406 with
+    {"errors":[{"code":"urn:au-cds:error:cds-all:Header/UnsupportedVersion",...}]} and correct
+    x-v echo on supported versions.'
+- id: cds-error-codes
+  name: CDS error code registry (urn:au-cds:error:*)
+  conforms: true
+  verified: live
+  evidence: live 406 body carried code urn:au-cds:error:cds-all:Header/UnsupportedVersion with
+    title and detail in the mandated errors[] envelope.
+  artifact: errors/simply-energy-problem-types.yml
+- id: cds-pagination
+  name: CDS pagination (page / page-size, links, meta.totalRecords)
+  conforms: true
+  verified: live
+  evidence: 'GET /energy/plans?page-size=1 returned meta {totalRecords: 2452, totalPages: 2452}
+    and links {self, next, last}.'
+- id: fapi-1-0-advanced
+  name: FAPI 1.0 Advanced (Financial-grade API Advanced Profile)
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: |
+    The CDR Security Profile is built on FAPI 1.0 Advanced and binds all data holders. The
+    holder's InfoSec endpoints are published only through the authenticated portion of the CDR
+    Register; anonymous /.well-known/openid-configuration probes returned HTTP 404.
+  docs: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+- id: oauth2
+  name: OAuth 2.0
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: mandated by the CDR Security Profile for all consumer data sharing; not declared in
+    the shared OpenAPI (which carries no securitySchemes).
+- id: oidc
+  name: OpenID Connect 1.0
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: mandated by the CDR Security Profile; includes PPID subject types and CDR-specific
+    claims.
+- id: oauth2-par
+  name: OAuth 2.0 Pushed Authorisation Requests (RFC 9126)
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: PAR is mandatory in the CDR Security Profile authorisation flow.
+- id: oauth2-pkce
+  name: PKCE (RFC 7636)
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: mandatory in the CDR Security Profile.
+- id: oauth2-mtls
+  name: OAuth 2.0 Mutual-TLS client authentication and certificate-bound tokens (RFC 8705)
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: MTLS with holder-of-key token binding is mandatory for CDR resource calls.
+- id: jarm
+  name: JWT Secured Authorization Response Mode (JARM)
+  conforms: designated
+  verified: not-anonymously-verifiable
+  evidence: named in the CDR Security Profile.
+- id: rfc4122-uuid-correlation
+  name: RFC 4122 UUID correlation ids (x-fapi-interaction-id)
+  conforms: true
+  verified: live
+  evidence: 'live responses from cdr.energymadeeasy.gov.au carried
+    x-fapi-interaction-id: 5044b75e-d65f-43aa-bb9a-c2edb4bbd0ed.'
+- id: cors
+  name: CORS for unauthenticated CDR endpoints
+  conforms: true
+  verified: live
+  evidence: 'access-control-allow-origin: * on both public hosts;
+    access-control-expose-headers: x-v, Retry-After, x-fapi-interaction-id.'
+- id: openapi-3-0
+  name: OpenAPI 3.0.3
+  conforms: true
+  verified: artifact
+  evidence: both harvested contracts declare openapi 3.0.3; 22 paths, 27 operations total.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: CDS defines its own errors[] envelope on application/json; application/problem+json
+    is not used anywhere in either specification.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: no Sunset or Deprecation response header. Retirement is governed by the published
+    Endpoint Version Schedule instead. See lifecycle/simply-energy-lifecycle.yml.
+- id: idempotency-key
+  conforms: false
+  evidence: the Consumer Data Standards define no idempotency key or replay window. See
+    conventions/simply-energy-conventions.yml.
+- id: asyncapi
+  conforms: false
+  evidence: no event, streaming or webhook surface exists in the CDR energy data-holder
+    contract. Not applicable rather than missing.
+- id: json-api
+  conforms: false
+- id: odata
+  conforms: false
+- id: fhir-r4
+  conforms: false
+- id: scim2
+  conforms: false
+- id: green-button-espi
+  conforms: false
+  evidence: Green Button / ESPI has no role in the Australian Consumer Data Right energy
+    regime. IEEE 2030.5, OpenADR, OCPP, OCPI and IEC CIM 61968/61970 were not found anywhere
+    in this provider's public surface either.
+regulatory:
+- regime: cdr-energy
+  instrument: Competition and Consumer Act 2010 (Cth) Part IVD; Competition and Consumer
+    (Consumer Data Right) Rules
+  regulator: Australian Competition and Consumer Commission (ACCC)
+  standards_body: Data Standards Body
+  designation: energy data holder, provider number DH002028
+  register_entry: https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
+  register_brand: ENGIE
+  status: live-implemented
+certifications_published: []
+certifications_note: |
+  No SOC 2, ISO 27001, PCI DSS or equivalent certification is published on any surface this
+  pipeline could reach; probe-security-programs.py found no trust centre and no vulnerability
+  disclosure programme. CDR accreditation imposes the information security controls in
+  Schedule 2 of the CDR Rules, but that obligation binds accredited DATA RECIPIENTS, not this
+  data holder, and is not a published certification. No Compliance pointer is wired for this
+  provider.

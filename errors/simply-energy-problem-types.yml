@@ -1,0 +1,224 @@
+generated: '2026-07-27'
+method: searched
+source: openapi/simply-energy-cds-common-openapi.yml, openapi/simply-energy-cds-energy-openapi.yml
+docs: https://consumerdatastandardsaustralia.github.io/standards/#error-codes
+provider_published: false
+format: cds-error-list
+format_note: |
+  NOT RFC 9457. The Consumer Data Standards define their own error envelope. Responses use
+  application/json (never application/problem+json) and carry a top-level `errors` array of
+  objects with `code`, `title`, `detail` and optional `meta`. The `code` is a URN in the
+  namespace urn:au-cds:error:cds-all: (cross-industry), urn:au-cds:error:cds-energy:
+  (energy-specific) or urn:au-cds:error:cds-banking: (not applicable here).
+envelope:
+  media_type: application/json
+  schema: ResponseErrorListV2 / PrimaryResponseErrorListV1
+  shape:
+    errors:
+    - code: URN string identifying the error class
+      title: Short human-readable title
+      detail: Contextual detail - usually the offending field, header or resource id
+      meta: Optional object with additional error metadata
+live_example:
+  request: 'GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status with x-v: 9'
+  status: 406
+  observed: '2026-07-27'
+  body:
+    errors:
+    - code: urn:au-cds:error:cds-all:Header/UnsupportedVersion
+      title: Unsupported Version
+      detail: Unable to locate a version of ResponseCommonDiscoveryStatus that is between
+        version 9 and 9
+problems:
+- status: 400
+  code: urn:au-cds:error:cds-all:Field/Missing
+  title: Missing Required Field
+  detail: The request is missing a mandatory field required for the API - a missing query
+    parameter or a missing field in the request payload.
+  remediation: Supply the field named in the error detail.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 400
+  code: urn:au-cds:error:cds-all:Header/Missing
+  title: Missing Required Header
+  detail: A required HTTP header has not been provided. The detail is the header name.
+  remediation: Most commonly the mandatory x-v header. Send x-v with a positive integer.
+  applies_to: unauthenticated and authenticated
+  obligation: SHOULD
+- status: 400
+  code: urn:au-cds:error:cds-all:Field/Invalid
+  title: Invalid Field
+  detail: A URL parameter or request body parameter is of an invalid type, or violates the
+    field constraints defined by the interface contract.
+  remediation: Correct the field named in the error detail to the type/format in the spec.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 400
+  code: urn:au-cds:error:cds-all:Header/Invalid
+  title: Invalid Header
+  detail: An HTTP header was provided but its value is an invalid type or violates the CDR
+    field type constraints.
+  applies_to: unauthenticated and authenticated
+  obligation: SHOULD
+- status: 400
+  code: urn:au-cds:error:cds-all:Field/InvalidDateTime
+  title: Invalid Date
+  detail: An invalid date was supplied. Applies to DateTimeString, DateString and TimeString
+    field types.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 400
+  code: urn:au-cds:error:cds-all:Field/InvalidPageSize
+  title: Invalid Page Size
+  detail: The page-size pagination field exceeds the CDR maximum of 1000.
+  remediation: Request page-size <= 1000.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 400
+  code: urn:au-cds:error:cds-all:Header/InvalidVersion
+  title: Invalid Version
+  detail: x-v, x-min-v or x-<HID>-v is not a positive integer.
+  remediation: Send x-v as a positive integer, e.g. x-v = 1.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 403
+  code: urn:au-cds:error:cds-all:Authorisation/AdrStatusNotActive
+  title: ADR Status Is Not Active
+  detail: The accredited data recipient or its software product is not active. The detail
+    carries the current status.
+  applies_to: authenticated
+- status: 403
+  code: urn:au-cds:error:cds-all:Authorisation/RevokedConsent
+  title: Consent Is Revoked
+  detail: The consumer's consent is no longer authorised (revoked or expired).
+  remediation: Re-obtain consumer consent through the CDR consent flow.
+  applies_to: authenticated
+  obligation: SHOULD
+- status: 403
+  code: urn:au-cds:error:cds-all:Authorisation/InvalidConsent
+  title: Consent Is Invalid
+  detail: The consent is not associated with the requested resource, is insufficient to
+    execute it, or is in a status that prevents execution.
+  applies_to: authenticated
+  obligation: SHOULD
+- status: 404
+  code: urn:au-cds:error:cds-all:Resource/NotImplemented
+  title: Resource Not Implemented
+  detail: The URL is a valid CDR endpoint but is not implemented or not currently supported
+    by this data holder.
+  note: |
+    Observed live. GET https://public.cdr.engie.com.au/cds-au/v1/energy/plans returns an
+    nginx HTTP 404 rather than a CDS-shaped body, because generic tariff data for CDR energy
+    is centralised at the Australian Energy Regulator's Energy Made Easy service rather than
+    self-hosted by the retailer.
+  applies_to: unimplemented APIs
+  obligation: SHOULD
+- status: 404
+  code: urn:au-cds:error:cds-all:Resource/NotFound
+  title: Resource Not Found
+  detail: The requested URL is not a CDR-defined API endpoint and is not recognised by the
+    data holder.
+- status: 404
+  code: urn:au-cds:error:cds-all:Resource/Invalid
+  title: Invalid Resource
+  detail: The resource identifier in the URI is permanently unavailable. No subsequent
+    request for it will succeed.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 404
+  code: urn:au-cds:error:cds-all:Resource/Unavailable
+  title: Unavailable Resource
+  detail: The resource identifier in the URI is temporarily unavailable. Subsequent requests
+    may succeed.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+- status: 404
+  code: urn:au-cds:error:cds-energy:Authorisation/InvalidEnergyAccount
+  title: Invalid Energy Account
+  detail: The requested energy account (accountId in the URI) is permanently unavailable.
+  applies_to: authenticated
+  obligation: MUST
+- status: 404
+  code: urn:au-cds:error:cds-energy:Authorisation/UnavailableEnergyAccount
+  title: Unavailable Energy Account
+  detail: The requested energy account (accountId in the URI) is temporarily unavailable.
+  applies_to: authenticated
+  obligation: MUST
+- status: 404
+  code: urn:au-cds:error:cds-energy:Authorisation/InvalidServicePoint
+  title: Invalid Service Point
+  detail: The requested service point (servicePointId in the URI) is permanently unavailable.
+  applies_to: authenticated
+  obligation: MUST
+- status: 404
+  code: urn:au-cds:error:cds-energy:Authorisation/UnavailableServicePoint
+  title: Unavailable Service Point
+  detail: The requested service point (servicePointId in the URI) is temporarily unavailable.
+  applies_to: authenticated
+  obligation: MUST
+- status: 406
+  code: urn:au-cds:error:cds-all:Header/UnsupportedVersion
+  title: Unsupported Version
+  detail: The requested endpoint version is below the minimum or above the maximum the data
+    holder supports for that endpoint. The detail MAY name the supported range.
+  remediation: |
+    Retry with a supported x-v. Confirmed live for this provider - /energy/plans answers at
+    x-v 1, /energy/plans/{planId} answers at x-v 3, /discovery/status and /discovery/outages
+    answer at x-v 1 and reject x-v 2 and above.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST
+  confirmed_live: true
+- status: 422
+  code: urn:au-cds:error:cds-all:Resource/Invalid
+  title: Invalid Resource
+  detail: A resource identifier supplied in the REQUEST BODY is permanently unavailable.
+    Applies to the POST bulk-query endpoints.
+  applies_to: authenticated
+  obligation: MUST
+- status: 422
+  code: urn:au-cds:error:cds-all:Resource/Unavailable
+  title: Unavailable Resource
+  detail: A resource identifier supplied in the request body is temporarily unavailable.
+  applies_to: authenticated
+  obligation: MUST
+- status: 422
+  code: urn:au-cds:error:cds-energy:Authorisation/InvalidServicePoint
+  title: Invalid Service Point
+  detail: A service point id supplied in the request body is permanently unavailable.
+  source_operation: openapi/simply-energy-cds-energy-openapi.yml#listElectricityUsageForServicePoints
+  applies_to: authenticated
+  obligation: MUST
+- status: 422
+  code: urn:au-cds:error:cds-energy:Authorisation/UnavailableServicePoint
+  title: Unavailable Service Point
+  detail: A service point id supplied in the request body is temporarily unavailable.
+  source_operation: openapi/simply-energy-cds-energy-openapi.yml#listElectricityDERForSpecificServicePoints
+  applies_to: authenticated
+  obligation: MUST
+- status: 422
+  code: urn:au-cds:error:cds-energy:Authorisation/InvalidEnergyAccount
+  title: Invalid Energy Account
+  detail: An account id supplied in the request body is permanently unavailable.
+  source_operation: openapi/simply-energy-cds-energy-openapi.yml#listEnergyAccountBalancesSpecificAccounts
+  applies_to: authenticated
+  obligation: MUST
+- status: 422
+  code: urn:au-cds:error:cds-energy:Authorisation/UnavailableEnergyAccount
+  title: Unavailable Energy Account
+  detail: An account id supplied in the request body is temporarily unavailable.
+  source_operation: openapi/simply-energy-cds-energy-openapi.yml#listEnergyInvoicesForSpecificAccounts
+  applies_to: authenticated
+  obligation: MUST
+- status: 422
+  code: urn:au-cds:error:cds-all:Authorisation/InvalidArrangement
+  title: Invalid Consent Arrangement
+  detail: The CDR arrangement being executed has previously been revoked; no further action
+    will be taken.
+  applies_to: authenticated
+- status: 422
+  code: urn:au-cds:error:cds-all:Field/InvalidPage
+  title: Invalid Page
+  detail: The requested page is out of range. The detail SHOULD be the maximum available
+    page count.
+  applies_to: unauthenticated and authenticated
+  obligation: MUST

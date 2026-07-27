@@ -1,0 +1,35 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+# Informational
+Expires: 2027-07-03T00:00:00.000Z
+Canonical: https://www.engie.com/.well-known/security.txt
+
+# Our security address
+Contact: mailto:cert@engie.com
+
+# Our PGP key is available at the following address
+Encryption: https://www.engie.com/sites/default/files/assets/documents/2025-07/ENGIE%20CERT_0x13F8B408_public.asc
+
+# Our preferred languages
+Preferred-Languages: en, fr
+
+# Our job offers and hiring policy
+Hiring: https://jobs.engie.com/
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEAm75wELE40ixLKV/eHRNNhP4tAgFAmhmOqAACgkQeHRNNhP4
+tAiHmQ/6AlJnlIhH9hGsVPTyjF5usK7cK5GcMObXDVNhGBuBFEwCmgip/K4xtWLn
+SL3cCU8/cEB4uTAGEhGunEK1OEveNywA0FvFK0/uUBIm7QZV1J2QtR9jb1q0qJFc
+7PGhlYVK1C5QsdynTvgmqYpO3OkKubTq8zRoH6RJtYuJ5vlTcUJXAZCoRg27D5Gp
+kmx4xaOV3XOVOt0STvxQ9JX0xewK+f051aMy99ow3Bf6VgHVM66z8KGizp0Axysh
+llOGmRVwyhBkXaUxgtIo8UQvCy8HKMhZfcgjfjykj9N+GyEewisgQ5KZaPF1NNIA
+ELTkmQX0eyxD+u3x00v06gFGVxx2XfP6rkWGpkTdVucNFQfMMLCNJXzG0MDhF2ok
+0M7cz+KvyJ3YVtm6yWsb0SBuW/2p8R30lvDl1ciur5clqPjcVsyR5/IoL+uqPTtQ
+3Oi39jBSO5GBkMomGjbcxQh8MPNVDv3MXA8OYwKUfcoQCPh0fNJHF8i+NDVloMZ7
+S7Q87uw3DRSNpPdfizaWz7fgo8Kkjcft+CHaBFD61FE8vdlXvoyy8Ntd2WGMuleC
+um5m4/jYAMStxcrGmo8eZ6Fdpxwkc5IA3Jf2cPyU2ykb+U+x+soZBujEp9raVxAN
+OWjJfwXAAF3Qa36qmQEFxR47H7YctjVXHksLIE05zXXLIzjo+1Y=
+=hHfk
+-----END PGP SIGNATURE-----

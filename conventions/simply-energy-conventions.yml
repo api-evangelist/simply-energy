@@ -1,0 +1,118 @@
+generated: '2026-07-27'
+method: searched
+source: https://consumerdatastandardsaustralia.github.io/standards/
+provider_published: false
+provenance_note: |
+  The cross-cutting request/response semantics of this API are set by the Data Standards Body
+  Consumer Data Standards, which bind this data holder (provider number DH002028). They were
+  read from the published standard and corroborated against live anonymous responses from
+  https://cdr.energymadeeasy.gov.au/engie/cds-au/v1 and
+  https://public.cdr.engie.com.au/cds-au/v1 on 2026-07-27.
+authentication:
+  style: none for public endpoints; OAuth2/OIDC under the CDR FAPI 1.0 Advanced profile with
+    MTLS for consumer data
+  artifact: authentication/simply-energy-authentication.yml
+idempotency:
+  supported: false
+  detail: |
+    The Consumer Data Standards define NO idempotency key. There is no Idempotency-Key header,
+    no request-replay window and no idempotent-retry contract. This is a read-only data-sharing
+    regime - all but five operations are GETs, and the five POST operations
+    (listElectricityUsageForServicePoints, listElectricityDERForSpecificServicePoints,
+    listEnergyAccountBalancesSpecificAccounts, listEnergyInvoicesForSpecificAccounts,
+    listEnergyAccountBillingForSpecificAccounts) are POST-as-query: they carry a list of
+    identifiers in the body and mutate nothing, so they are naturally idempotent without a key.
+    Recorded as a deliberate negative - no Idempotency pointer is wired for this provider.
+versioning:
+  scheme: dual - major version in the URI path plus per-endpoint version in an HTTP header
+  uri_pattern: https://<holder-path>/cds-au/v<major>/<industry>
+  current_uri_version: v1
+  endpoint_version_header: x-v
+  minimum_version_header: x-min-v
+  response_header: x-v
+  negotiation: |
+    The client sends x-v (required, positive integer) and optionally x-min-v. The data holder
+    responds with the highest version it supports between x-min-v and x-v, echoing the served
+    version in the x-v response header. If no requested version is supported it MUST return
+    HTTP 406 with urn:au-cds:error:cds-all:Header/UnsupportedVersion.
+  observed_versions:
+  - {operation: listEnergyPlans, x_v: 1}
+  - {operation: getEnergyPlanDetail, x_v: 3}
+  - {operation: getStatus, x_v: 1}
+  - {operation: getOutages, x_v: 1}
+  artifact: lifecycle/simply-energy-lifecycle.yml
+pagination:
+  style: page-number
+  params:
+  - {name: page, in: query, default: 1, detail: page number, first page is 1}
+  - {name: page-size, in: query, default: 25, max: 1000, detail: records per page}
+  response_fields:
+    links: [self, first, prev, next, last]
+    meta: [totalRecords, totalPages]
+  errors:
+  - urn:au-cds:error:cds-all:Field/InvalidPageSize
+  - urn:au-cds:error:cds-all:Field/InvalidPage
+  live_example:
+    request: GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans?page-size=1
+    observed: '2026-07-27'
+    meta: {totalRecords: 2452, totalPages: 2452}
+    links_keys: [self, next, last]
+request_tracing:
+  header: x-fapi-interaction-id
+  format: RFC 4122 UUID
+  behaviour: |
+    If the client supplies x-fapi-interaction-id the data holder MUST play the same value back
+    in the response header. If the client does not supply one, the data holder MUST generate
+    and return one. Confirmed live - the AER-hosted plans endpoint returned
+    x-fapi-interaction-id on every response.
+  additional_observed: [x-amzn-trace-id, x-amz-cf-id, x-amzn-requestid]
+error_envelope:
+  media_type: application/json
+  shape: '{"errors": [{"code": "<urn>", "title": "...", "detail": "...", "meta": {}}]}'
+  code_namespace: [urn:au-cds:error:cds-all, urn:au-cds:error:cds-energy]
+  rfc9457: false
+  artifact: errors/simply-energy-problem-types.yml
+rate_limit_signaling:
+  header: Retry-After
+  detail: |
+    Retry-After is the CDS throttling signal and is explicitly listed in the
+    access-control-expose-headers of the live public endpoints
+    (access-control-expose-headers: x-v, Retry-After, x-fapi-interaction-id). There is no
+    X-RateLimit-Limit / -Remaining / -Reset family. Numeric traffic thresholds are set by the
+    standard rather than advertised per-response.
+  artifact: rate-limits/simply-energy-rate-limits.yml
+id_permanence:
+  detail: |
+    Resource IDs MUST be entirely arbitrary with no inherent meaning, MUST be immutable across
+    sessions and consents, and MUST NOT be transferable across data recipient software
+    products (a pairwise-per-recipient identifier). This is a CDS-normative privacy control
+    and directly affects client-side caching and joins.
+  applies_to: [accountId, servicePointId, planId, invoiceNumber]
+  exception: |
+    planId on the public generic-tariff endpoint is NOT pairwise - it is a stable public
+    identifier. Observed form: ENG1145433MRE1@EME.
+field_conventions:
+  naming: lowerCamelCase
+  envelope: 'every response is {"data": ..., "links": ..., "meta": ...}'
+  date_types: [DateString (RFC 3339 full-date), DateTimeString (RFC 3339), TimeString]
+  amount_type: AmountString - a string, not a number, to preserve precision
+  currency_default: AUD
+  base64_headers: x-cds-client-headers is Base64-encoded
+cors:
+  detail: |
+    CORS is normative in the CDS for unauthenticated endpoints. Confirmed live -
+    access-control-allow-origin: * on both public hosts, with
+    access-control-allow-headers: Range,x-v,x-min-v and access-control-max-age: 3600 on
+    public.cdr.engie.com.au.
+data_latency_and_caching:
+  detail: |
+    The standard requires data recipient software products to cache low-velocity data sets and
+    not re-request the same resource until it is expected to have changed. Generic tariff data
+    is explicitly low velocity; each plan carries lastUpdated and effectiveFrom/effectiveTo.
+cross_links:
+  authentication: authentication/simply-energy-authentication.yml
+  scopes: scopes/simply-energy-scopes.yml
+  errors: errors/simply-energy-problem-types.yml
+  lifecycle: lifecycle/simply-energy-lifecycle.yml
+  rate_limits: rate-limits/simply-energy-rate-limits.yml
+  conformance: conformance/simply-energy-conformance.yml

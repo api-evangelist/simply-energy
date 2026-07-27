@@ -1,0 +1,50 @@
+generated: '2026-07-27'
+method: searched
+source: npm registry search, PyPI, and the provider's public surface
+first_party_sdks: 0
+note: |
+  Simply Energy / ENGIE publishes NO client library in any registry. Searched npm, PyPI, and
+  the provider's own surface on 2026-07-27; there is no developer portal, no SDK page and no
+  attributable GitHub organisation (github.com/SimplyEnergy and github.com/Simply-Energy exist
+  but could not be attributed to the Australian retailer - their repos are unrelated forks;
+  github.com/engie-group is ENGIE SA's global organisation, not an Australian retail API
+  surface). No `SDKs` pointer is wired for this provider, because none of the packages below
+  are first-party.
+
+  What DOES exist is a small ecosystem of Consumer Data Standards libraries that a developer
+  integrating with any Australian CDR energy data holder - including this one - would actually
+  reach for. They are recorded as ecosystem packages with official: false.
+packages:
+- language: typescript
+  registry: npm
+  name: '@types/consumer-data-standards'
+  version: 7.4.0
+  url: https://www.npmjs.com/package/@types/consumer-data-standards
+  install: npm install --save-dev @types/consumer-data-standards
+  repository: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/consumer-data-standards
+  description: TypeScript type definitions for the Australian Consumer Data Standards payloads,
+    including the energy schemas this provider serves.
+  official: false
+  publisher: DefinitelyTyped (community)
+  relevance: types for every schema in openapi/simply-energy-cds-energy-openapi.yml
+- language: javascript
+  registry: npm
+  name: '@cds-au/holder-sdk'
+  version: 2.3.0
+  url: https://www.npmjs.com/package/@cds-au/holder-sdk
+  install: npm install @cds-au/holder-sdk
+  description: NodeJS middleware that generates errors in line with the Australian Consumer
+    Data Standards technical specifications.
+  official: false
+  publisher: third party (data-holder implementer tooling, not published by this retailer)
+  relevance: implements the errors[] envelope catalogued in errors/simply-energy-problem-types.yml
+registries_probed:
+- {registry: npm, query: 'consumer-data-standards / cdr-au / simply energy', first_party_hits: 0}
+- {registry: pypi, query: consumer-data-standards, status: 404}
+- {registry: pypi, query: simply-energy, first_party_hits: 0}
+- {registry: rubygems, first_party_hits: 0}
+- {registry: packagist, first_party_hits: 0}
+- {registry: crates.io, first_party_hits: 0}
+- {registry: maven-central, first_party_hits: 0}
+- {registry: nuget, first_party_hits: 0}
+- {registry: pkg.go.dev, first_party_hits: 0}

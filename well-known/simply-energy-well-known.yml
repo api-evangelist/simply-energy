@@ -1,0 +1,81 @@
+generated: '2026-07-27'
+method: searched
+source: live anonymous HTTP probes of every apis.yml baseURL host, the OpenAPI servers[] hosts
+  and the company web hosts
+note: |
+  No /.well-known/ document was recoverable on any host in this provider's surface. This is
+  recorded as a negative result, not an omission. Two distinct causes were observed:
+
+  (1) The two live CDR hosts (public.cdr.engie.com.au, cdr.energymadeeasy.gov.au) return a
+      clean HTTP 404 for every probed path. Consumer Data Right data holders publish their
+      OpenID Provider Configuration through the AUTHENTICATED portion of the CDR Register,
+      reachable only by an ACCC-accredited data recipient presenting a CDR client
+      certificate, so an anonymous /.well-known/openid-configuration is expected to be
+      absent by design.
+  (2) The two corporate web hosts (engie.com.au, www.simplyenergy.com.au) sit behind
+      Cloudflare and return HTTP 403 to every automated fetcher, so absence there is
+      unproven rather than confirmed.
+
+  The OpenAPI servers[] host, https://mtls.dh.example.com, is the Data Standards Body
+  placeholder host from the shared specification and is not a real endpoint; it was not
+  probed.
+  A single 200 WAS recovered, but on the ultimate parent group's host (www.engie.com, ENGIE SA,
+  France) rather than on any Australian retail or CDR host. It is recorded with that scope
+  stated explicitly so it is never read as an Australian retail-entity publication.
+documents_found: 1
+documents_found_on_provider_hosts: 0
+hosts:
+- host: https://www.engie.com
+  role: ultimate parent group (ENGIE SA, France) - NOT an Australian retail or CDR host
+  scope: engie-group
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: simply-energy-engie-group-security.txt
+    format: RFC 9116, PGP-signed
+    contact: mailto:cert@engie.com
+    encryption: https://www.engie.com/sites/default/files/assets/documents/2025-07/ENGIE%20CERT_0x13F8B408_public.asc
+    expires: '2027-07-03T00:00:00.000Z'
+    preferred_languages: [en, fr]
+    canonical: https://www.engie.com/.well-known/security.txt
+    fetched: '2026-07-27'
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+- host: https://public.cdr.engie.com.au
+  role: registered CDR Public Base URI (apis[].baseURL)
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://cdr.energymadeeasy.gov.au
+  role: AER-hosted CDR generic tariff data host (apis[].baseURL)
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://engie.com.au
+  role: company website (post-rebrand)
+  blocked_by: Cloudflare
+  documents:
+  - {path: /.well-known/security.txt, status: 403}
+  - {path: /.well-known/openid-configuration, status: 403}
+  - {path: /.well-known/oauth-authorization-server, status: 403}
+  - {path: /.well-known/oauth-protected-resource, status: 403}
+  - {path: /.well-known/api-catalog, status: 403}
+  - {path: /.well-known/ai-plugin.json, status: 403}
+- host: https://www.simplyenergy.com.au
+  role: company website (legacy brand)
+  blocked_by: Cloudflare
+  documents:
+  - {path: /.well-known/security.txt, status: 403}
+  - {path: /.well-known/openid-configuration, status: 403}
+  - {path: /.well-known/oauth-authorization-server, status: 403}
+  - {path: /.well-known/oauth-protected-resource, status: 403}
+  - {path: /.well-known/api-catalog, status: 403}
+  - {path: /.well-known/ai-plugin.json, status: 403}

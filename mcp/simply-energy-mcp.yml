@@ -1,0 +1,69 @@
+generated: '2026-07-27'
+method: derived
+source: openapi/simply-energy-cds-energy-openapi.yml, openapi/simply-energy-cds-common-openapi.yml
+status: candidate
+summary: >-
+  No official hosted or remote Model Context Protocol server exists for Simply Energy / ENGIE,
+  and none exists for the Australian Consumer Data Right energy regime generally. Searched the
+  provider surface, npm and the CDR ecosystem on 2026-07-27; nothing found. The tool set below
+  is DERIVED from the Consumer Data Standards operations this data holder implements, as a
+  proposal for an agent-facing surface. It is not published by the provider and no MCPServer
+  pointer is wired in apis.yml.
+server: null
+transport: null
+discovery_probes:
+- {target: 'https://public.cdr.engie.com.au/.well-known/oauth-protected-resource', status: 404}
+- {target: 'https://cdr.energymadeeasy.gov.au/.well-known/oauth-protected-resource', status: 404}
+- {target: 'npm search "consumer-data-standards" / "cdr-au"', result: no MCP server package}
+candidate_tools_public:
+- name: list_energy_plans
+  description: List the retail electricity and gas tariff plans ENGIE currently offers to the
+    market, with pagination and fuel-type/customer-type filters.
+  source_operation: openapi/simply-energy-cds-energy-openapi.yml#listEnergyPlans
+  maps_to: 'GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans (x-v: 1)'
+  auth: none
+  verified_live: true
+  note: returned HTTP 200 with meta.totalRecords 2452 on 2026-07-27
+- name: get_energy_plan_detail
+  description: Retrieve the full contract for one tariff plan - pricing model, tariff periods,
+    controlled load, discounts, incentives, fees, eligibility and solar feed-in tariff.
+  source_operation: openapi/simply-energy-cds-energy-openapi.yml#getEnergyPlanDetail
+  maps_to: 'GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans/{planId} (x-v: 3)'
+  auth: none
+  verified_live: true
+- name: get_data_holder_status
+  description: Check whether the ENGIE CDR data-holder implementation is operational.
+  source_operation: openapi/simply-energy-cds-common-openapi.yml#getStatus
+  maps_to: 'GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status (x-v: 1)'
+  auth: none
+  verified_live: true
+- name: get_data_holder_outages
+  description: List scheduled outages for the ENGIE CDR data-holder implementation.
+  source_operation: openapi/simply-energy-cds-common-openapi.yml#getOutages
+  maps_to: 'GET https://public.cdr.engie.com.au/cds-au/v1/discovery/outages (x-v: 1)'
+  auth: none
+  verified_live: true
+candidate_tools_accredited_only:
+- {name: get_customer, source_operation: 'openapi/simply-energy-cds-common-openapi.yml#getCustomer', scope: 'common:customer.basic:read'}
+- {name: get_customer_detail, source_operation: 'openapi/simply-energy-cds-common-openapi.yml#getCustomerDetail', scope: 'common:customer.detail:read'}
+- {name: list_energy_accounts, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#listEnergyAccounts', scope: 'energy:accounts.basic:read'}
+- {name: get_energy_account_detail, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getEnergyAccountDetail', scope: 'energy:accounts.detail:read'}
+- {name: get_energy_account_balance, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getEnergyAccountBalance', scope: 'energy:billing:read'}
+- {name: list_energy_account_balances_bulk, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#listEnergyAccountBalancesBulk', scope: 'energy:billing:read'}
+- {name: get_energy_account_invoices, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getEnergyAccountInvoices', scope: 'energy:billing:read'}
+- {name: get_billing_for_energy_account, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getBillingForEnergyAccount', scope: 'energy:billing:read'}
+- {name: get_energy_account_payment_schedule, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getEnergyAccountPaymentSchedule', scope: 'energy:accounts.paymentschedule:read'}
+- {name: get_energy_account_concessions, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getEnergyAccountConcessions', scope: 'energy:accounts.concessions:read'}
+- {name: list_electricity_service_points, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#listElectricityServicePoints', scope: 'energy:electricity.servicepoints.basic:read'}
+- {name: get_electricity_service_point_detail, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getElectricityServicePointDetail', scope: 'energy:electricity.servicepoints.detail:read'}
+- {name: get_electricity_service_point_usage, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getElectricityServicePointUsage', scope: 'energy:electricity.usage:read'}
+- {name: list_electricity_usage_bulk, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#listElectricityUsageBulk', scope: 'energy:electricity.usage:read'}
+- {name: get_electricity_der_for_service_point, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#getElectricityDERForServicePoint', scope: 'energy:electricity.der:read'}
+- {name: list_electricity_der_bulk, source_operation: 'openapi/simply-energy-cds-energy-openapi.yml#listElectricityDERBulk', scope: 'energy:electricity.der:read'}
+accredited_gate_note: |
+  Every tool in candidate_tools_accredited_only requires ACCC accreditation as a data
+  recipient, a CDR client certificate, a software product registered on the CDR Register,
+  the CDR FAPI 1.0 Advanced security profile (OAuth2/OIDC + PAR + PKCE + MTLS), and an
+  explicit, scoped, time-limited consumer consent. There is no self-serve key and no sandbox
+  tier. An MCP server exposing these tools would have to carry the consent artefact as part of
+  its session state, not just a bearer token. See agentic-access/simply-energy-agentic-access.yml.

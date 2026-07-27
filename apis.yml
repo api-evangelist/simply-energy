@@ -57,10 +57,15 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/simply-energy-cds-energy-openapi.yml
+  - type: Overlay
+    url: overlays/simply-energy-cds-energy-overlay.yaml
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
   - type: Documentation
     url: https://engie.com.au/help-centre/cdr-policy
+  - type: AgentSkill
+    name: Compare ENGIE retail energy plans
+    url: skills/simply-energy-compare-energy-plans.md
 - aid: simply-energy:simply-energy-cdr-discovery-api
   name: Simply Energy (ENGIE) CDR Discovery API
   description: The Consumer Data Standards Common Discovery API served from the brand's own
@@ -82,10 +87,17 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/simply-energy-cds-common-openapi.yml
+  - type: Overlay
+    url: overlays/simply-energy-cds-common-overlay.yaml
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
   - type: Documentation
     url: https://engie.com.au/help-centre/cdr-policy
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: AgentSkill
+    name: Check ENGIE CDR data-holder health and outages
+    url: skills/simply-energy-check-data-holder-health.md
 - aid: simply-energy:simply-energy-cdr-energy-consumer-data-api
   name: Simply Energy (ENGIE) CDR Energy Consumer Data API
   description: The mandated Consumer Data Right consumer data sharing surface, covering energy
@@ -109,11 +121,22 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/simply-energy-cds-energy-openapi.yml
+  - type: Overlay
+    url: overlays/simply-energy-cds-energy-overlay.yaml
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
   - type: Documentation
     url: https://engie.com.au/help-centre/cdr-policy
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+  - type: AgentSkill
+    name: Retrieve a consumer's ENGIE energy accounts, usage and billing
+    url: skills/simply-energy-retrieve-consumer-energy-data.md
 common:
+- type: DomainSecurity
+  url: security/simply-energy-domain-security.yml
+- type: AgenticAccess
+  url: agentic-access/simply-energy-agentic-access.yml
 - type: Website
   url: https://www.simplyenergy.com.au/
 - type: Website
@@ -126,6 +149,50 @@ common:
   url: https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
 - type: LinkedIn
   url: https://www.linkedin.com/company/engie-australia-new-zealand/
+- type: HelpCenter
+  url: https://engie.com.au/help-centre
+- type: Blog
+  url: https://engie.com.au/media-news
+- type: PrivacyPolicy
+  url: https://engie.com.au/help-centre/policies-and-commitments/privacy-policy
+- type: TermsOfService
+  url: https://engie.com.au/help-centre/policies-and-commitments/terms-of-use
+- type: Authentication
+  url: authentication/simply-energy-authentication.yml
+- type: OAuthScopes
+  url: scopes/simply-energy-scopes.yml
+- type: Conventions
+  url: conventions/simply-energy-conventions.yml
+- type: ErrorCatalog
+  url: errors/simply-energy-problem-types.yml
+- type: RateLimits
+  url: rate-limits/simply-energy-rate-limits.yml
+- type: Lifecycle
+  url: lifecycle/simply-energy-lifecycle.yml
+- type: StatusPage
+  url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+- type: Deprecation
+  url: https://consumerdatastandardsaustralia.github.io/standards/#endpoint-version-schedule
+- type: ChangeLog
+  url: changelog/simply-energy-changelog.yml
+- type: Conformance
+  url: conformance/simply-energy-conformance.yml
+- type: DataModel
+  url: data-model/simply-energy-data-model.yml
+- type: Packages
+  url: packages/simply-energy-packages.yml
+- type: WellKnown
+  url: well-known/simply-energy-well-known.yml
+- type: SecurityTxt
+  url: well-known/simply-energy-engie-group-security.txt
+- type: VulnerabilityDisclosure
+  url: security/simply-energy-vulnerability-disclosure.yml
+- type: Security
+  url: https://www.engie.com/en/cert/
+- type: LLMsTxt
+  url: llms/simply-energy-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

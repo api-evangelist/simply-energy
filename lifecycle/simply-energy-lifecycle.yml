@@ -1,0 +1,86 @@
+generated: '2026-07-27'
+method: searched
+source: https://consumerdatastandardsaustralia.github.io/standards/
+provider_published: false
+provenance_note: |
+  The versioning, deprecation and service-level obligations of this API are set by the
+  Consumer Data Standards and the CDR Rules, not by the retailer. The one lifecycle surface
+  the retailer genuinely operates itself is the live CDS discovery status/outages pair on its
+  own registered CDR Public Base URI - confirmed HTTP 200 on 2026-07-27.
+versioning:
+  scheme: uri-path major version + per-endpoint header version
+  uri_version: v1
+  uri_pattern: https://<holder-path>/cds-au/v<major>/<industry>
+  endpoint_version_header: x-v
+  standards_version: 1.36.0
+  standards_versioning: '<major>.<minor>.<bugfix>'
+  docs: https://consumerdatastandardsaustralia.github.io/standards/#versioning
+  endpoint_version_schedule: https://consumerdatastandardsaustralia.github.io/standards/#endpoint-version-schedule
+  observed_live:
+  - {endpoint: /energy/plans, served_at_x_v: 1, rejects: [2, 3, 4]}
+  - {endpoint: '/energy/plans/{planId}', served_at_x_v: 3, rejects: [1, 2, 4, 5]}
+  - {endpoint: /discovery/status, served_at_x_v: 1, rejects: [2, 3, 9]}
+  - {endpoint: /discovery/outages, served_at_x_v: 1, rejects: [2, 3]}
+deprecation:
+  policy_url: https://consumerdatastandardsaustralia.github.io/standards/#endpoint-version-schedule
+  future_dated_obligations_url: https://consumerdatastandardsaustralia.github.io/standards/#future-dated-obligations
+  sunset_header: false
+  deprecation_header: false
+  mechanism: |
+    The CDR does not use RFC 8594 Sunset/Deprecation headers. Endpoint retirement is governed
+    instead by two published, dated instruments:
+      - the Endpoint Version Schedule, which lists every endpoint version, the standards
+        release that introduced it, its obligation date and its retirement date; and
+      - the Future Dated Obligations schedule, which names each forthcoming binding change and
+        the date it takes effect (for example, data recipients must implement Redirect to App
+        on and from 10 May 2027).
+    Superseded endpoint versions are archived as "obsolete versions" pages linked from the
+    endpoint description in the specification itself; the energy and common specs in this repo
+    carry those links inline (for example getCustomerDetail references the obsolete v1 page).
+    Version negotiation is therefore explicit and client-driven via x-v / x-min-v rather than
+    signalled by response headers.
+  obsolete_versions_pattern: https://consumerdatastandardsaustralia.github.io/standards/includes/obsolete/
+sla:
+  url: https://consumerdatastandardsaustralia.github.io/standards/#availability-requirements
+  uptime_target: 99.5% per month
+  applies_to: both authenticated and unauthenticated endpoints
+  unavailability_definition: any period during which any API endpoint defined in the standard
+    is unable to reliably provide a successful response to an appropriately constructed request
+  planned_outages:
+    excluded_from_target: true
+    notice: published to data recipient software products with at least one week lead time for
+      normal outages; may occur without notification to resolve a critical service or security
+      issue
+  performance:
+    target: 95% of calls per hour responded to within the nominated threshold
+    thresholds:
+    - {tier: Unauthenticated, response_time_ms: 1500, applies_to: all unauthenticated endpoints
+        not otherwise specified}
+    - {tier: High Priority, response_time_ms: 1000, applies_to: 'InfoSec endpoints, CDR
+        Arrangement Revocation, Get Status, Get Outages, and customer-present Get Energy
+        Accounts / Get Energy Account Detail / Get Balance For Energy Account / Get Invoices
+        For Account / Get Customer / Get Customer Detail'}
+    - {tier: Low Priority, response_time_ms: 1500, applies_to: 'customer-present calls to the
+        remaining energy and common resource endpoints, including Get Agreed Payment Schedule
+        and Get Concessions'}
+status_page: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+status_page_note: |
+  This is a machine-readable CDS Get Status endpoint operated by the retailer on its own
+  registered CDR Public Base URI - not an HTML status dashboard. It is the status surface the
+  standard mandates and the one an integrator actually polls. Confirmed HTTP 200 on
+  2026-07-27 returning {"data":{"status":"OK","explanation":"All services operational"}}.
+outages_endpoint: https://public.cdr.engie.com.au/cds-au/v1/discovery/outages
+outages_note: Confirmed HTTP 200 on 2026-07-27 with an empty outages array. Scheduled outages
+  are published here with outageTime, duration, isPartial and explanation.
+deprecated_operations: []
+deprecated_operations_note: >-
+  No operation in either harvested specification carries a `deprecated` flag set to true.
+brand_lifecycle:
+  event: Simply Energy rebranded to ENGIE in April 2024 after seventeen years.
+  effect: |
+    The CDR Register entry, the registered public base URI and every live endpoint now carry
+    the ENGIE brand. The legal entities are unchanged (IPower Pty Ltd, IPower 2 Pty Ltd,
+    Simply Energy Solutions Pty Ltd) and the data holder provider number DH002028 is unchanged.
+    The legacy Energy Made Easy slug /simply-energy returns HTTP 200 with zero plans, which -
+    given that an arbitrary unknown slug also returns HTTP 200 with zero plans - is NOT
+    evidence of a retired registered slug.

@@ -1,0 +1,131 @@
+generated: '2026-07-27'
+method: searched
+source: openapi/simply-energy-cds-energy-openapi.yml, openapi/simply-energy-cds-common-openapi.yml
+docs: https://consumerdatastandardsaustralia.github.io/standards/#authorisation-scopes
+provider_published: false
+provenance_note: |
+  `derive-oauth-scopes.py` returned zero, because the shared Consumer Data Standards OpenAPI
+  documents carry no oauth2 securitySchemes. The scopes are nevertheless present and
+  machine-readable in the spec: every operation declares an `x-scopes` extension. The ten
+  scopes below were extracted from those `x-scopes` values and then enriched with the
+  consumer-facing data cluster and permission language published in the CDR Data Language
+  Standards. This is the normative scope set for an Australian energy data holder; this
+  retailer publishes no scope reference of its own.
+schemes:
+- name: CDR Security Profile (OAuth 2.0 + OpenID Connect, FAPI 1.0 Advanced)
+  source: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: null
+    tokenUrl: null
+    note: |
+      The authorisation and token endpoints of an energy data holder are published only via
+      the authenticated portion of the CDR Register and are not anonymously discoverable.
+      See authentication/simply-energy-authentication.yml.
+scopes:
+- scope: openid
+  description: Required OpenID Connect scope. Establishes the authenticated CDR session.
+  category: openid-connect
+  flows: [authorizationCode]
+- scope: profile
+  description: OpenID Connect end-user data. In the CDR this is restricted to the standard
+    claims defined by the Profile Scope and Standard Claims standard.
+  category: openid-connect
+  flows: [authorizationCode]
+- scope: common:customer.basic:read
+  description: Basic information on the customer who authorised the session - name and
+    customer type.
+  data_cluster_language: Name and occupation / Organisation profile
+  category: common
+  operations: [getCustomer]
+  sources: [openapi/simply-energy-cds-common-openapi.yml]
+  flows: [authorizationCode]
+- scope: common:customer.detail:read
+  description: Detailed information on the authorised customer, adding contact details.
+  data_cluster_language: Contact details
+  category: common
+  operations: [getCustomerDetail]
+  sources: [openapi/simply-energy-cds-common-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:accounts.basic:read
+  description: Energy accounts and plans.
+  data_cluster_language: Accounts and plans
+  permission_language: Account and plan information
+  category: energy-accounts
+  operations: [listEnergyAccounts]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:accounts.detail:read
+  description: Energy account and plan details.
+  data_cluster_language: Account and plan details
+  permission_language: Account type; Fees, features, rates, and discounts; Additional account
+    users
+  category: energy-accounts
+  operations: [getEnergyAccountDetail]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:accounts.concessions:read
+  description: Concessions and assistance applied to the account.
+  data_cluster_language: Concessions and assistance
+  permission_language: Concession type; Concession information
+  category: energy-accounts
+  operations: [getEnergyAccountConcessions]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:accounts.paymentschedule:read
+  description: Agreed payment schedule and payment preferences.
+  data_cluster_language: Payment preferences
+  permission_language: Payment and billing frequency; Any scheduled payment details
+  category: energy-accounts
+  operations: [getEnergyAccountPaymentSchedule]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:billing:read
+  description: Billing, balances, invoices and payment history.
+  data_cluster_language: Billing payments and history
+  permission_language: Account balance; Payment method; Payment status; Charges, discounts,
+    credits; Billing date; Usage for billing period; Payment date; Invoice number
+  category: energy-billing
+  operations: [getEnergyAccountBalance, listEnergyAccountBalancesBulk, listEnergyAccountBalancesSpecificAccounts,
+    getEnergyAccountInvoices, listEnergyAccountInvoicesBulk, listEnergyInvoicesForSpecificAccounts,
+    getBillingForEnergyAccount, listEnergyAccountBillingBulk, listEnergyAccountBillingForSpecificAccounts]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:electricity.servicepoints.basic:read
+  description: Electricity connection - the NMI standing data basic set.
+  data_cluster_language: Electricity connection
+  permission_language: National Meter Identifier (NMI); Customer type; Connection point details
+  category: energy-servicepoints
+  operations: [listElectricityServicePoints]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:electricity.servicepoints.detail:read
+  description: Electricity connection and meter - the NMI standing data detail set.
+  data_cluster_language: Electricity meter
+  permission_language: Supply address; Meter details; Associated service providers
+  category: energy-servicepoints
+  operations: [getElectricityServicePointDetail]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:electricity.usage:read
+  description: Electricity usage reads for the consented service points.
+  data_cluster_language: Electricity usage
+  permission_language: Usage; Meter details
+  category: energy-usage
+  operations: [getElectricityServicePointUsage, listElectricityUsageBulk, listElectricityUsageForServicePoints]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+- scope: energy:electricity.der:read
+  description: Distributed energy resources - generation and storage devices behind the meter.
+  data_cluster_language: Energy generation and storage
+  permission_language: Generation information; Generation or storage device type; Device
+    characteristics; Devices that can operate without the grid; Energy conversion information
+  category: energy-der
+  operations: [getElectricityDERForServicePoint, listElectricityDERBulk, listElectricityDERForSpecificServicePoints]
+  sources: [openapi/simply-energy-cds-energy-openapi.yml]
+  flows: [authorizationCode]
+unscoped_operations:
+- {operationId: listEnergyPlans, reason: public unauthenticated generic tariff data}
+- {operationId: getEnergyPlanDetail, reason: public unauthenticated generic tariff data}
+- {operationId: getStatus, reason: public unauthenticated discovery endpoint}
+- {operationId: getOutages, reason: public unauthenticated discovery endpoint}

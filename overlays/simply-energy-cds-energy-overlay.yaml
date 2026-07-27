@@ -1,0 +1,97 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Simply Energy (ENGIE) CDR Energy API
+  version: 1.0.0
+extends: openapi/simply-energy-cds-energy-openapi.yml
+x-generated: '2026-07-27'
+x-method: generated
+x-source: API Evangelist enrichment pipeline; live anonymous probes 2026-07-27
+x-note: >-
+  The harvested specification is the shared Data Standards Body contract and declares the
+  placeholder server https://mtls.dh.example.com/cds-au/v1. This overlay binds it to the real,
+  confirmed hosts for this provider and records provider-specific facts, without mutating the
+  harvested document.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: simply-energy
+    x-apievangelist-provider-name: Simply Energy (ENGIE)
+    x-apievangelist-brand-note: >-
+      Simply Energy rebranded to ENGIE in April 2024. The CDR Register entry, the registered
+      public base URI and every live endpoint carry the ENGIE brand name. The legal entities
+      (IPower Pty Ltd, IPower 2 Pty Ltd, Simply Energy Solutions Pty Ltd) and the data holder
+      provider number DH002028 are unchanged.
+    x-cdr-data-holder-provider-number: DH002028
+    x-cdr-register: https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
+    x-cdr-data-holder-brand-id: 40128cc1-56f8-ed11-a83b-000d3a8830d6
+    x-cdr-abn: '67269241237'
+    x-spec-provenance: >-
+      Harvested verbatim from
+      https://consumerdatastandardsaustralia.github.io/standards/includes/swagger/cds_energy.json
+      on 2026-07-27 and converted from JSON to YAML with no content change. This is the shared
+      standard, not a retailer-proprietary specification.
+- target: $.servers
+  update:
+  - url: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+    description: >-
+      CONFIRMED LIVE 2026-07-27. Public, unauthenticated CDR generic tariff data, hosted on the
+      retailer's behalf by the Australian Energy Regulator's Energy Made Easy service. Serves
+      /energy/plans (x-v 1) and /energy/plans/{planId} (x-v 3) only.
+    x-gate: public
+    x-verified: '2026-07-27'
+  - url: https://public.cdr.engie.com.au/cds-au/v1
+    description: >-
+      CONFIRMED LIVE 2026-07-27. The brand's own registered CDR Public Base URI. Serves the CDS
+      Common discovery endpoints only; returns nginx HTTP 404 for /energy/plans.
+    x-gate: public
+    x-verified: '2026-07-27'
+  - url: https://mtls.dh.example.com/cds-au/v1
+    description: >-
+      Data Standards Body PLACEHOLDER host from the shared specification. Not a real endpoint.
+      The retailer's real MTLS resource base URI is published only through the authenticated
+      portion of the CDR Register to accredited data recipients.
+    x-gate: accredited-only
+    x-placeholder: true
+- target: $.paths['/energy/plans'].get
+  update:
+    x-apievangelist-verified: '2026-07-27'
+    x-apievangelist-verified-host: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+    x-apievangelist-observed:
+      status: 200
+      x-v: '1'
+      totalRecords: 2452
+      note: >-
+        MARKET and STANDING electricity and gas plans under brand "engie" / brandName "ENGIE",
+        across Ausgrid, Endeavour, Essential Energy, Energex, SA Power Networks, Jemena and AGN.
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: none
+- target: $.paths['/energy/plans/{planId}'].get
+  update:
+    x-apievangelist-verified: '2026-07-27'
+    x-apievangelist-verified-host: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+    x-apievangelist-observed:
+      status: 200
+      x-v: '3'
+      example-planId: ENG1145433MRE1@EME
+      note: HTTP 406 at x-v 1, 2, 4 and 5; only x-v 3 is served.
+- target: $.paths['/energy/accounts'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-note: >-
+      Not anonymously verifiable. Requires ACCC accreditation, a CDR client certificate, the
+      CDR FAPI 1.0 Advanced security profile and an explicit consumer consent carrying
+      energy:accounts.basic:read.
+- target: $.components
+  update:
+    x-apievangelist-artifacts:
+      authentication: authentication/simply-energy-authentication.yml
+      scopes: scopes/simply-energy-scopes.yml
+      conventions: conventions/simply-energy-conventions.yml
+      errors: errors/simply-energy-problem-types.yml
+      lifecycle: lifecycle/simply-energy-lifecycle.yml
+      rate_limits: rate-limits/simply-energy-rate-limits.yml
+      conformance: conformance/simply-energy-conformance.yml
+      data_model: data-model/simply-energy-data-model.yml
+      agentic_access: agentic-access/simply-energy-agentic-access.yml

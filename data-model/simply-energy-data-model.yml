@@ -1,0 +1,137 @@
+generated: '2026-07-27'
+method: derived
+source: openapi/simply-energy-cds-energy-openapi.yml, openapi/simply-energy-cds-common-openapi.yml
+description: |
+  Entity-relationship graph derived from the two harvested Consumer Data Standards contracts -
+  schema $ref links plus id-reference fields (accountId, servicePointId, planId). This is the
+  shared CDR energy data model every Australian energy data holder implements; nothing here is
+  proprietary to this retailer.
+id_permanence_note: |
+  Per the CDS ID Permanence standard, accountId and servicePointId are arbitrary, meaningless,
+  immutable-per-consent identifiers that are NOT transferable across data recipient software
+  products. planId on the public generic-tariff surface is the exception - it is a stable
+  public identifier, observed in the form ENG1145433MRE1@EME.
+entities:
+- name: EnergyPlan
+  schema: EnergyPlan
+  id_field: planId
+  gate: public
+  operations: [listEnergyPlans, getEnergyPlanDetail]
+  key_fields: [planId, effectiveFrom, effectiveTo, lastUpdated, displayName, description, type,
+    fuelType, brand, brandName, applicationUri, customerType, geography]
+  detail_schema: EnergyPlanDetailV3
+  observed_scale: 2452 live plans under the ENGIE brand on 2026-07-27
+- name: EnergyPlanContract
+  schema: EnergyPlanContractV3
+  parent: EnergyPlan
+  key_fields: [additionalFeeInformation, pricingModel, timeZone, isFixed, tariffPeriod,
+    controlledLoad, incentives, discounts, greenPowerCharges, eligibility, fees,
+    solarFeedInTariff]
+- name: EnergyAccount
+  schema: EnergyAccountV2 / EnergyAccountBaseV2
+  id_field: accountId
+  gate: accredited-only
+  operations: [listEnergyAccounts, getEnergyAccountDetail]
+  key_fields: [accountId, accountNumber, displayName, openStatus, creationDate]
+  detail_schema: EnergyAccountDetailV4
+- name: EnergyServicePoint
+  schema: EnergyServicePointV2
+  id_field: servicePointId
+  gate: accredited-only
+  operations: [listElectricityServicePoints, getElectricityServicePointDetail]
+  key_fields: [servicePointId, nationalMeteringId, servicePointClassification,
+    servicePointStatus, jurisdictionCode, isGenerator, validFromDate, lastUpdateDateTime,
+    lastConsumerChangeDate, consumerProfile]
+  detail_schema: EnergyServicePointDetailV2
+- name: EnergyUsageRead
+  schema: EnergyUsageRead
+  gate: accredited-only
+  operations: [getElectricityServicePointUsage, listElectricityUsageBulk,
+    listElectricityUsageForServicePoints]
+  key_fields: [servicePointId, registerId, registerSuffix, meterId, controlledLoad,
+    readStartDate, readEndDate, unitOfMeasure, readUType, basicRead, intervalRead]
+- name: EnergyDerRecord
+  schema: EnergyDerRecord
+  gate: accredited-only
+  operations: [getElectricityDERForServicePoint, listElectricityDERBulk,
+    listElectricityDERForSpecificServicePoints]
+  key_fields: [servicePointId, approvedCapacity, availablePhasesCount, installedPhasesCount,
+    islandableInstallation, hasCentralProtectionControl, protectionMode, acConnections]
+- name: EnergyInvoice
+  schema: EnergyInvoice
+  id_field: invoiceNumber
+  gate: accredited-only
+  operations: [getEnergyAccountInvoices, listEnergyAccountInvoicesBulk,
+    listEnergyInvoicesForSpecificAccounts]
+  key_fields: [accountId, invoiceNumber, issueDate, dueDate, period, invoiceAmount, gstAmount,
+    payOnTimeDiscount, balanceAtIssue, servicePoints, gas, electricity, accountCharges,
+    paymentStatus]
+- name: EnergyBillingTransaction
+  schema: EnergyBillingTransactionV3
+  gate: accredited-only
+  operations: [getBillingForEnergyAccount, listEnergyAccountBillingBulk,
+    listEnergyAccountBillingForSpecificAccounts]
+  key_fields: [accountId, executionDateTime, gst, transactionUType, usage, demand, onceOff,
+    otherCharges, payment]
+  variants: [EnergyBillingUsageTransactionV2, EnergyBillingDemandTransactionV3,
+    EnergyBillingOnceOffTransaction, EnergyBillingOtherTransaction,
+    EnergyBillingPaymentTransaction]
+- name: EnergyBalance
+  schema: EnergyBalanceResponse / EnergyBalanceListResponse
+  gate: accredited-only
+  operations: [getEnergyAccountBalance, listEnergyAccountBalancesBulk,
+    listEnergyAccountBalancesSpecificAccounts]
+- name: EnergyPaymentSchedule
+  schema: EnergyPaymentSchedule
+  gate: accredited-only
+  operations: [getEnergyAccountPaymentSchedule]
+  key_fields: [amount, paymentScheduleUType, cardDebit, directDebit, digitalWallet,
+    manualPayment]
+- name: EnergyConcession
+  schema: EnergyConcession
+  gate: accredited-only
+  operations: [getEnergyAccountConcessions]
+  key_fields: [type, displayName, additionalInfo, additionalInfoUri, startDate, endDate,
+    discountFrequency, amount, percentage, appliedTo]
+- name: CommonCustomer
+  schema: ResponseCommonCustomer / ResponseCommonCustomerDetailV2
+  gate: accredited-only
+  operations: [getCustomer, getCustomerDetail]
+  source: openapi/simply-energy-cds-common-openapi.yml
+- name: DiscoveryStatus
+  schema: ResponseCommonDiscoveryStatus
+  gate: public
+  operations: [getStatus]
+  source: openapi/simply-energy-cds-common-openapi.yml
+- name: DiscoveryOutage
+  schema: DiscoveryOutage
+  gate: public
+  operations: [getOutages]
+  source: openapi/simply-energy-cds-common-openapi.yml
+relationships:
+- {from: EnergyAccount, to: EnergyServicePoint, type: has_many, via: servicePointId,
+   note: 'an account covers one or more electricity connection points'}
+- {from: EnergyAccount, to: EnergyPlan, type: has_one, via: planId,
+   note: 'account detail carries the plan the account is on'}
+- {from: EnergyAccount, to: EnergyInvoice, type: has_many, via: accountId}
+- {from: EnergyAccount, to: EnergyBillingTransaction, type: has_many, via: accountId}
+- {from: EnergyAccount, to: EnergyBalance, type: has_one, via: accountId}
+- {from: EnergyAccount, to: EnergyPaymentSchedule, type: has_one, via: accountId}
+- {from: EnergyAccount, to: EnergyConcession, type: has_many, via: accountId}
+- {from: EnergyServicePoint, to: EnergyUsageRead, type: has_many, via: servicePointId}
+- {from: EnergyServicePoint, to: EnergyDerRecord, type: has_many, via: servicePointId}
+- {from: EnergyInvoice, to: EnergyServicePoint, type: has_many, via: servicePoints}
+- {from: EnergyPlan, to: EnergyPlanContract, type: has_many, via: '$ref EnergyPlanContractV3'}
+- {from: EnergyBillingTransaction, to: EnergyAccount, type: belongs_to, via: accountId}
+- {from: EnergyUsageRead, to: EnergyServicePoint, type: belongs_to, via: servicePointId}
+- {from: EnergyDerRecord, to: EnergyServicePoint, type: belongs_to, via: servicePointId}
+- {from: CommonCustomer, to: EnergyAccount, type: has_many, via: consent scope,
+   note: 'the authorised customer is the consent subject; the link is the CDR consent, not an
+     id field in the payload'}
+shared_schemas: [CommonPhysicalAddress, CommonSimpleAddress, CommonPAFAddress, Links, Meta,
+  LinksPaginated, MetaPaginated, ErrorV2, MeasureUnitEnum, EnergyDaysEnum]
+counts:
+  entities: 14
+  relationships: 15
+  energy_schemas: 133
+  operations: 27

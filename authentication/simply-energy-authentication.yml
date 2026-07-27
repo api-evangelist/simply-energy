@@ -1,0 +1,102 @@
+generated: '2026-07-27'
+method: searched
+source: openapi/simply-energy-cds-common-openapi.yml, openapi/simply-energy-cds-energy-openapi.yml
+docs: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+provider_published: false
+provenance_note: |
+  The Data Standards Body Consumer Data Standards OpenAPI documents this provider conforms to
+  declare NO components.securitySchemes at all - `derive-authentication.py` returned an empty
+  profile. That is a property of the shared specification, not evidence that the API is
+  unauthenticated. The real authentication model is normative and lives in the CDR Security
+  Profile, which is binding on this data holder (provider number DH002028). This profile was
+  therefore SEARCHED from the published standard rather than derived from the spec, and every
+  claim below is traceable to the Consumer Data Standards or to a live anonymous probe.
+summary:
+  types: [none, oauth2, openIdConnect, mutualTLS]
+  api_key_in: []
+  oauth2_flows: [authorizationCode]
+  surfaces_by_gate:
+    public_unauthenticated: 2
+    accredited_only: 1
+surfaces:
+- name: CDR Energy Generic Plans (public tariff data)
+  api: simply-energy:simply-energy-cdr-energy-generic-plans-api
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  auth: none
+  scheme_type: none
+  detail: |
+    Fully anonymous. No API key, no registration, no agreement. The only mandatory request
+    header is x-v (endpoint version). Confirmed live on 2026-07-27: an anonymous
+    GET /energy/plans?page-size=1 with x-v: 1 returned HTTP 200 with meta.totalRecords 2452.
+  required_headers: [x-v]
+  optional_headers: [x-min-v]
+- name: CDR Common Discovery (status and outages)
+  api: simply-energy:simply-energy-cdr-discovery-api
+  baseURL: https://public.cdr.engie.com.au/cds-au/v1
+  auth: none
+  scheme_type: none
+  detail: |
+    Fully anonymous. Confirmed live on 2026-07-27: GET /discovery/status with x-v: 1 returned
+    HTTP 200 with {"data":{"status":"OK",...}} and the response carried
+    strict-transport-security: max-age=63072000; includeSubDomains.
+  required_headers: [x-v]
+  optional_headers: [x-min-v]
+- name: CDR Energy Consumer Data (accredited only)
+  api: simply-energy:simply-energy-cdr-energy-consumer-data-api
+  baseURL: null
+  auth: oauth2 + openIdConnect + mutualTLS
+  scheme_type: oauth2
+  gate: accredited-only
+  detail: |
+    Not anonymously verifiable. The InfoSec and resource base URIs of an energy data holder
+    are published only through the authenticated portion of the CDR Register and are reachable
+    only by an ACCC-accredited data recipient presenting a CDR client certificate. Anonymous
+    probes for /.well-known/openid-configuration on public.cdr.engie.com.au and on
+    cdr.energymadeeasy.gov.au both returned HTTP 404 (see well-known/).
+  profile:
+    name: CDR Security Profile
+    based_on: FAPI 1.0 Advanced (Financial-grade API Advanced Profile) + OpenID Connect 1.0
+    docs: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+    mechanisms:
+    - OAuth 2.0 authorization code flow with OpenID Connect
+    - Pushed Authorisation Requests (PAR)
+    - PKCE (Proof Key for Code Exchange)
+    - private_key_jwt client authentication
+    - Mutually Authenticated TLS (MTLS) with holder-of-key token binding
+    - JARM (JWT Secured Authorization Response Mode)
+    - Pairwise Pseudonymous Identifiers (PPID) as subject type
+    - Request objects signed as JWT
+    prerequisites:
+    - ACCC accreditation as a data recipient under the CDR Rules
+    - CDR client certificate issued under the CDR PKI
+    - Software product registered on the CDR Register (Dynamic Client Registration)
+    - Explicit, scoped, time-limited consumer consent (CDR consent model)
+    scopes: scopes/simply-energy-scopes.yml
+request_context_headers:
+- name: x-v
+  required: true
+  detail: Endpoint version requested. Must be a positive integer. Mismatch returns HTTP 406
+    urn:au-cds:error:cds-all:Header/UnsupportedVersion.
+- name: x-min-v
+  required: false
+  detail: Minimum acceptable endpoint version.
+- name: x-fapi-interaction-id
+  required: false
+  detail: RFC 4122 UUID correlation id. The data holder MUST play it back in the response.
+    Confirmed present on live responses from both public hosts.
+- name: x-fapi-auth-date
+  required: conditional
+  detail: Time the customer last logged in to the data recipient software product. Required
+    for all authenticated resource calls. Not used on unauthenticated calls.
+- name: x-fapi-customer-ip-address
+  required: false
+  detail: Customer's original IP when the call is customer-present. Not to be included for
+    unauthenticated calls.
+- name: x-cds-client-headers
+  required: conditional
+  detail: Base64-encoded original customer HTTP headers. Mandatory for customer-present calls.
+evidence:
+- {source: 'live probe 2026-07-27', detail: 'GET https://cdr.energymadeeasy.gov.au/engie/cds-au/v1/energy/plans?page-size=1 (x-v 1) -> HTTP 200, no credential presented'}
+- {source: 'live probe 2026-07-27', detail: 'GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status (x-v 1) -> HTTP 200, no credential presented'}
+- {source: 'live probe 2026-07-27', detail: 'GET https://public.cdr.engie.com.au/cds-au/v1/discovery/status (x-v 9) -> {"errors":[{"code":"urn:au-cds:error:cds-all:Header/UnsupportedVersion",...}]}'}
+- {source: https://consumerdatastandardsaustralia.github.io/standards/#security-profile, detail: CDR Security Profile - FAPI 1.0 Advanced, PAR, PKCE, private_key_jwt, MTLS, JARM}

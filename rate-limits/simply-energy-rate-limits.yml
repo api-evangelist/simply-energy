@@ -1,0 +1,93 @@
+generated: '2026-07-27'
+method: searched
+source: https://consumerdatastandardsaustralia.github.io/standards/#traffic-thresholds
+provider_published: false
+provenance_note: |
+  This retailer publishes no rate-limit page of its own. The traffic thresholds below are
+  normative Consumer Data Standards Non-Functional Requirements and are binding on it as a
+  designated CDR energy data holder (provider number DH002028). Calls in excess of these
+  thresholds may be freely throttled or rejected by the data holder without breaching its
+  performance or availability obligations.
+signaling:
+  header: Retry-After
+  detail: Retry-After is exposed on the live public endpoints via
+    access-control-expose-headers, observed 2026-07-27. No X-RateLimit-* family is defined.
+metrics_used: [sessions per day, transactions per second (TPS), calls per session]
+rate_limits:
+- name: Public (unauthenticated) traffic
+  applies_to: [listEnergyPlans, getEnergyPlanDetail, getStatus, getOutages]
+  limit_count: 300
+  limit_unit: transactions per second
+  scope: total across all consumers, additive to secure traffic
+  authenticated: false
+- name: Customer-present and authorisation traffic - per customer
+  limit_count: 10
+  limit_unit: transactions per second
+  scope: per customer
+  authenticated: true
+- name: Customer-present and authorisation traffic - per software product
+  limit_count: 50
+  limit_unit: transactions per second
+  scope: per data recipient software product
+  authenticated: true
+- name: Customer-present sessions
+  limit_count: null
+  limit_unit: sessions per day
+  scope: unlimited
+  authenticated: true
+- name: Unattended traffic - sessions (low traffic periods)
+  limit_count: 20
+  limit_unit: sessions per day
+  scope: per customer, per data recipient software product
+  authenticated: true
+- name: Unattended traffic - calls per session
+  limit_count: 100
+  limit_unit: calls per session
+  authenticated: true
+- name: Unattended traffic - per session TPS
+  limit_count: 5
+  limit_unit: transactions per second
+  scope: per session
+  authenticated: true
+- name: Unattended traffic - per software product TPS
+  limit_count: 50
+  limit_unit: transactions per second
+  scope: per data recipient software product
+  authenticated: true
+- name: Secure traffic peak TPS - 0 to 10,000 active authorisations
+  limit_count: 150
+  limit_unit: peak transactions per second
+  scope: total across all consumers
+  authenticated: true
+- name: Secure traffic peak TPS - 10,001 to 20,000 active authorisations
+  limit_count: 200
+  limit_unit: peak transactions per second
+  authenticated: true
+- name: Secure traffic peak TPS - 20,001 to 30,000 active authorisations
+  limit_count: 250
+  limit_unit: peak transactions per second
+  authenticated: true
+- name: Secure traffic peak TPS - 30,001 to 40,000 active authorisations
+  limit_count: 300
+  limit_unit: peak transactions per second
+  authenticated: true
+- name: Secure traffic peak TPS - 40,001 to 50,000 active authorisations
+  limit_count: 350
+  limit_unit: peak transactions per second
+  authenticated: true
+- name: Secure traffic peak TPS - 50,001 to 60,000 active authorisations
+  limit_count: 400
+  limit_unit: peak transactions per second
+  authenticated: true
+- name: Secure traffic peak TPS - more than 60,000 active authorisations
+  limit_count: 450
+  limit_unit: peak transactions per second
+  authenticated: true
+pagination_limits:
+- {param: page-size, max: 1000, default: 25, error: 'urn:au-cds:error:cds-all:Field/InvalidPageSize'}
+notes:
+- Unattended traffic during high traffic periods receives best-effort support only.
+- Data recipients are expected to cache low-velocity data sets (generic tariff data is
+  explicitly low velocity) rather than re-requesting unchanged resources.
+- No thresholds apply to secondary data holders, because their traffic is already shaped by
+  the primary data holder thresholds.
