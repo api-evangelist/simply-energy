@@ -133,6 +133,8 @@ apis:
     name: Retrieve a consumer's ENGIE energy accounts, usage and billing
     url: skills/simply-energy-retrieve-consumer-energy-data.md
 common:
+- type: MCPServer
+  url: mcp/simply-energy-mcp.yml
 - type: DomainSecurity
   url: security/simply-energy-domain-security.yml
 - type: AgenticAccess
