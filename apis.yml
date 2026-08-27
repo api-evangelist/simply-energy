@@ -43,102 +43,197 @@ created: '2026-07-27'
 modified: '2026-07-27'
 specificationVersion: '0.23'
 apis:
-- aid: simply-energy:simply-energy-cdr-energy-generic-plans-api
-  name: Simply Energy (ENGIE) CDR Energy Generic Plans API
-  description: Public, unauthenticated Consumer Data Right Generic Tariff Data for the Simply
-    Energy / ENGIE retail brand, conforming to the Data Standards Body Consumer Data Standards
-    energy schemas. Confirmed live on 2026-07-27. GET /energy/plans returns HTTP 200 with
-    x-v 1 and meta.totalRecords 2452 ENGIE electricity and gas plans (MARKET and STANDING)
-    across Ausgrid, Endeavour, Essential Energy, Energex, SA Power Networks, Jemena and AGN
-    distribution zones. GET /energy/plans/{planId} returns HTTP 200 at x-v 3. The endpoint
-    is hosted on behalf of the retailer by the Australian Energy Regulator's Energy Made Easy
-    service; it is not self-hosted.
+- aid: simply-energy:simply-energy-data-holder-customers-api
+  name: Simply Energy Data Holder Customers API
+  description: Data Holder Customer endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Data Holder Customers
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-data-holder-customers-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-data-holder-operations-api
+  name: Simply Energy Data Holder Operations API
+  description: Data Holder Operations endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Data Holder Operations
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-data-holder-operations-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-distributed-energy-resources-api
+  name: Simply Energy Distributed Energy Resources API
+  description: Distributed Energy Resource endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Distributed Energy Resources
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-distributed-energy-resources-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-electricity-service-points-api
+  name: Simply Energy Electricity Service Points API
+  description: Electricity Service Point endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Electricity Service Points
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-electricity-service-points-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-electricity-usage-api
+  name: Simply Energy Electricity Usage API
+  description: Electricity Usage endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Electricity Usage
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-electricity-usage-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-energy-account-balances-api
+  name: Simply Energy Energy Account Balances API
+  description: Energy Account Balance endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Energy Account Balances
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-energy-account-balances-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-energy-account-billing-api
+  name: Simply Energy Energy Account Billing API
+  description: Energy Account Billing endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Energy Account Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-energy-account-billing-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-energy-accounts-api
+  name: Simply Energy Energy Accounts API
+  description: Energy Account endpoints
+  humanURL: https://engie.com.au/help-centre/cdr-policy
+  baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
+  tags:
+  - Energy Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/simply-energy-energy-accounts-api-openapi.yml
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://engie.com.au/help-centre/cdr-policy
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
+  - type: OAuthScopes
+    url: scopes/simply-energy-scopes.yml
+- aid: simply-energy:simply-energy-energy-plans-api
+  name: Simply Energy Energy Plans API
+  description: Energy Plan endpoints
   humanURL: https://engie.com.au/help-centre/cdr-policy
   baseURL: https://cdr.energymadeeasy.gov.au/engie/cds-au/v1
   tags:
   - Energy Plans
-  - Generic Tariff Data
-  - Consumer Data Right
-  - Public
   properties:
   - type: OpenAPI
-    url: openapi/simply-energy-cds-energy-openapi.yml
-  - type: Overlay
-    url: overlays/simply-energy-cds-energy-overlay.yaml
+    url: openapi/simply-energy-energy-plans-api-openapi.yml
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
   - type: Documentation
     url: https://engie.com.au/help-centre/cdr-policy
-  - type: AgentSkill
-    name: Compare ENGIE retail energy plans
-    url: skills/simply-energy-compare-energy-plans.md
-- aid: simply-energy:simply-energy-cdr-discovery-api
-  name: Simply Energy (ENGIE) CDR Discovery API
-  description: The Consumer Data Standards Common Discovery API served from the brand's own
-    registered CDR Public Base URI. Confirmed live on 2026-07-27. GET /discovery/status returns
-    HTTP 200 at x-v 1 with status OK, and GET /discovery/outages returns HTTP 200 at x-v 1
-    with an empty outages array. Both correctly reject x-v 2 and above with urn:au-cds:error:cds-all:Header/UnsupportedVersion.
-    This host does NOT serve /energy/plans, it returns an nginx HTTP 404, which matches the
-    behaviour of AGL, Alinta and Origin Energy and reflects the CDR energy design in which
-    generic tariff data is centralised at the Australian Energy Regulator rather than held
-    by each retailer.
-  humanURL: https://engie.com.au/help-centre/cdr-policy
-  baseURL: https://public.cdr.engie.com.au/cds-au/v1
-  tags:
-  - Discovery
-  - Status
-  - Outages
-  - Consumer Data Right
-  - Public
-  properties:
-  - type: OpenAPI
-    url: openapi/simply-energy-cds-common-openapi.yml
-  - type: Overlay
-    url: overlays/simply-energy-cds-common-overlay.yaml
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
-  - type: Documentation
-    url: https://engie.com.au/help-centre/cdr-policy
   - type: StatusPage
     url: https://public.cdr.engie.com.au/cds-au/v1/discovery/status
-  - type: AgentSkill
-    name: Check ENGIE CDR data-holder health and outages
-    url: skills/simply-energy-check-data-holder-health.md
-- aid: simply-energy:simply-energy-cdr-energy-consumer-data-api
-  name: Simply Energy (ENGIE) CDR Energy Consumer Data API
-  description: The mandated Consumer Data Right consumer data sharing surface, covering energy
-    accounts, balances, billing, invoices, concessions, payment schedules, electricity service
-    points, usage and distributed energy resources, conforming to the shared Consumer Data
-    Standards energy contract. NOT anonymously verifiable and deliberately listed without
-    a base URL. The CDR InfoSec and resource base URIs for a data holder are published only
-    through the authenticated portion of the CDR Register and are reachable only by an ACCC
-    accredited data recipient presenting a client certificate. Access requires ACCC accreditation,
-    OAuth2 / OpenID Connect under the CDR FAPI profile, mutual TLS, and explicit consumer
-    consent. Recorded here as designated and documented, not as an endpoint confirmed by API
-    Evangelist.
-  humanURL: https://engie.com.au/help-centre/cdr-policy
-  tags:
-  - Energy Accounts
-  - Usage
-  - Billing
-  - DER
-  - Consumer Data Right
-  - Accredited Only
-  properties:
-  - type: OpenAPI
-    url: openapi/simply-energy-cds-energy-openapi.yml
-  - type: Overlay
-    url: overlays/simply-energy-cds-energy-overlay.yaml
-  - type: APIReference
-    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
-  - type: Documentation
-    url: https://engie.com.au/help-centre/cdr-policy
   - type: OAuthScopes
     url: scopes/simply-energy-scopes.yml
-  - type: AgentSkill
-    name: Retrieve a consumer's ENGIE energy accounts, usage and billing
-    url: skills/simply-energy-retrieve-consumer-energy-data.md
 common:
+- type: Overlay
+  url: overlays/simply-energy-cds-energy-overlay.yaml
+- type: AgentSkill
+  url: skills/simply-energy-compare-energy-plans.md
+- type: Overlay
+  url: overlays/simply-energy-cds-common-overlay.yaml
+- type: AgentSkill
+  url: skills/simply-energy-check-data-holder-health.md
+- type: AgentSkill
+  url: skills/simply-energy-retrieve-consumer-energy-data.md
 - type: MCPServer
   url: mcp/simply-energy-mcp.yml
 - type: DomainSecurity
