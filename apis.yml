@@ -21,7 +21,13 @@ description: Simply Energy is the former brand of the Australian electricity and
   point and DER data are available only to ACCC accredited data recipients with explicit consumer
   consent, there is no developer portal, no self-serve API keys, no published OpenID Connect
   discovery document, and no open grid, market or system data of any kind.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/groq.png
+imageNote: >-
+  The `image` property was removed on 2026-08-26. It had been copied verbatim out of a
+  bootstrap template and pointed at an icon belonging to groq, not to this company.
+  That asset returns HTTP 200, so the record rendered another company's brand
+  rather than a broken image, which is why it went unreported (roadmap#153).
+  No correct icon has been sourced yet. Shipping the wrong company's mark is worse
+  than shipping none; re-run the icon backfill once a real asset exists.
 tags:
 - Energy
 - Australia
