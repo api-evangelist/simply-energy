@@ -51,6 +51,21 @@ deliveryModel:
   - pricing
   generated: '2026-08-28'
   method: derived
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  - scopes
+  - rate-limits
+  - security
+  generated: '2026-09-02'
+  method: derived
 created: '2026-07-27'
 modified: '2026-07-27'
 specificationVersion: '0.23'
@@ -246,8 +261,9 @@ common:
   url: skills/simply-energy-check-data-holder-health.md
 - type: AgentSkill
   url: skills/simply-energy-retrieve-consumer-energy-data.md
-- type: MCPServer
+- type: X-MCPServerCandidate
   url: mcp/simply-energy-mcp.yml
+  note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type surfaces with a server that does not exist.'
 - type: DomainSecurity
   url: security/simply-energy-domain-security.yml
 - type: AgenticAccess
